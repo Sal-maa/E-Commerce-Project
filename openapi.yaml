@@ -56,37 +56,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/responseForm'
               example:
-                request-login:
-                  description: Respon ketika sukses login
-                  value: {
-                    code: 200,
-                    status: Success,
-                    message: Berhasil login!,
-                    data: {
-                      token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2MzgzMjYxODAsInVzZXJJZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.AebFR-oQjUSOMez2ucDWkiMrS2eQIPmcYm5c71qZ_co
-                    }
+                  code: 200,
+                  status: Success,
+                  message: Berhasil login!,
+                  data: {
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2MzgzMjYxODAsInVzZXJJZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.AebFR-oQjUSOMez2ucDWkiMrS2eQIPmcYm5c71qZ_co
                   }
+                  
         '400':
           description: User login failed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/responseForm'
-              examples:
-                email-not-found:
-                  description: Respon gagal ketika email tak terdaftar
-                  value: {
-                    code: 400,
-                    status: Failed,
-                    message: Email tak terdaftar!,
-                  }
-                password-missmatch:
-                  description: Respon gagal ketika password error
-                  value: {
-                    code: 400,
-                    status: Failed,
-                    message: Password salah!,
-                  }
+              example:
+                  code: 400,
+                  status: Failed,
+                  message: Email tak terdaftar!,
+                
 
   /signup:
     post:
