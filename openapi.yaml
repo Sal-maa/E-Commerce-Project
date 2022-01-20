@@ -758,6 +758,8 @@ components:
       properties:
         "cart_id":
           type: array
+          items:
+            type: integer
           minLength: 1
         "address":
           type: object
@@ -1145,6 +1147,8 @@ components:
                 example: get all products Success
               data: 
                 type: array
+                items:
+                  type: object
                 example: [
                   {
                     name: candy,
@@ -1258,6 +1262,8 @@ components:
                 example: get all Carts Success
               data: 
                 type: array
+                items:
+                  type: object
                 example: [
                   {
                     product_id: 19,
@@ -1305,6 +1311,8 @@ components:
                 properties:
                   cart_id:
                     type: array
+                    items:
+                      type: integer
                     example: [12,55]
                   address:
                     type: object
