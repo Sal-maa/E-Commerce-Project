@@ -15,6 +15,8 @@ servers:
           - dev 
 
 tags:
+  - name: Auth
+    description: Authentication
   - name: Users
     description: User control
   - name: Products
@@ -25,6 +27,67 @@ tags:
     description: Orders control
 
 paths:
+  /login:
+    post:
+      tags:
+        - Auth
+      summary: User login
+      description: Path link for user to login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  minLength: 1
+                  example: testlogin@login.com
+                password:
+                  type: string
+                  minLength: 1
+                  example: loginpassword
+      responses:
+        '200':
+          description: User login success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                request-login:
+                  description: Respon ketika sukses login
+                  value: {
+                    code: 200,
+                    status: Success,
+                    message: Berhasil login!,
+                    data: {
+                      token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2MzgzMjYxODAsInVzZXJJZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.AebFR-oQjUSOMez2ucDWkiMrS2eQIPmcYm5c71qZ_co
+                    }
+                  }
+        '400':
+          description: User login failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              examples:
+                email-not-found:
+                  description: Respon gagal ketika email tak terdaftar
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Email tak terdaftar!,
+                  }
+                password-missmatch:
+                  description: Respon gagal ketika password error
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Password salah!,
+                  }
+
   /signup:
     post:
       tags:
@@ -54,7 +117,43 @@ paths:
           $ref: '#/components/responses/FailedBinding'
         '500':
           $ref: '#/components/responses/FailedSeverError'
+  
+  
   /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user's information
+      description: Path link for user to get personal information
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          description: user id
+          in: path
+          schema:
+            type: integer
+            example: 1
+          required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/getUserByIdSuccess'
+        '400':
+          description: Failed to create user account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                id-outofscope:
+                  description: Respon gagal ketika salah memasukan id
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: User id di luar batas!,
+                  }
+
+    
     put:
       tags:
         - Users
@@ -135,6 +234,71 @@ paths:
           $ref: '#/components/responses/getAllProductSuccess'
         '400':
           $ref: '#/components/responses/getProductsFailed'
+
+    post:
+      tags:
+        - Products
+      summary: Create product
+      description: Path link for user to create new product
+      security:
+        - JWTAuth: []
+      
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/productSchema'
+            example:
+              product-one:
+                description: "Contoh pembuatan produk pertama"
+                value: {
+                  user_id: 12,
+                  nama: produk pertama,
+                  kategori: barang,
+                  stok: 200,
+                  harga: 10000,
+                  deskripsi: barang ini merupakan barang pertama group project,
+                  gambar: www.google.image.com
+                }
+      responses:
+        '200':
+          description: Berhasil membuat produk
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                respon-berhasil:
+                  description: sukses membuat produk
+                  value: {
+                    code: 200,
+                    status: Success,
+                    message: Produk telah dibuat!
+                  }
+        '400':
+          description: Failed to create product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              examples:
+                stock-zero:
+                  description: Respon gagal ketika stok dimuat nol
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Tidak dapat membuat produk apabila stok kosong!,
+                  }
+                price-zero:
+                  description: Respon gagal ketika harga dimuat nol
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Tidak dapat membuat produk dengan harga 0 atau gratis!,
+                  }
+        '500':
+          $ref: '#/components/responses/FailedSeverError'
   /products/{id}:
     get:
       tags:
@@ -153,6 +317,119 @@ paths:
           $ref: '#/components/responses/getProductSuccess'
         '400':
           $ref: '#/components/responses/getProductsFailed'
+
+    put:
+      tags:
+        - Products
+      summary: Modify product
+      description: Path link for user to modify new product
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          description: user id
+          in: path
+          schema:
+            type: integer
+            example: 1
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/productSchema'
+            example:
+              nama: Produk 1 ubah nama
+              kategori: jasa
+              stok: 900
+              harga: 2233000
+              deskripsi: Mengubah detail produk 1
+              gambar: www.google.image.com
+      responses:
+        '200':
+          description: Berhasil mengubah detail produk
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                respon-berhasil:
+                  description: sukses memperbaharui produk
+                  value: {
+                    code: 200,
+                    status: Success,
+                    message: Produk telah dimodifikasi!
+                  }
+        '400':
+          description: Failed to modify product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              examples:
+                stock-zero:
+                  description: Respon gagal ketika stok dimuat nol
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Tidak dapat mengubah produk apabila stok kosong!,
+                  }
+                price-zero:
+                  description: Respon gagal ketika harga dimuat nol
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Tidak dapat membuat produk dengan harga 0 atau gratis!,
+                  }
+        '500':
+          $ref: '#/components/responses/FailedSeverError'
+
+    delete:
+      tags:
+        - Products
+      summary: Delete product
+      description: Path link for user to delete product
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          description: user id
+          in: path
+          schema:
+            type: integer
+            example: 1
+          required: true
+      responses:
+        '200':
+          description: Product deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                success:
+                  description: Respon sukses ketika produk dihapus
+                  value: {
+                    code: 200,
+                    status: Success,
+                    message: Produk dihapus!,
+                  }
+        '400':
+          description: Produk deletion failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                id-outofscope:
+                  description: Respon gagal ketika salah memasukan id
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Product id di luar batas!,
+                  }
+
   /carts:
     post:
       tags:
@@ -248,6 +525,41 @@ paths:
         '500':
           $ref: '#/components/responses/FailedSeverError'
   /orders:
+    get:
+      tags:
+      - Orders
+      summary: Get all order details
+      description: Path link for user to create new product
+      security:
+        - JWTAuth: []
+      responses:
+        '200':
+          description: Success get orders data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/orderSchema'
+              example:
+                id: 2
+                tanggal: 20-01-2022
+                alamat: jalan raya nasional km.0
+                pembayaran:
+                  nama: si bayar
+                  nomorkartu: 0000-1111-2222-3333
+                  cvv: 007
+                  expired: 12/21
+                status: cancel
+        '400':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                code: 400
+                status: Failed
+                message: Product id di luar batas!
+
     post:
       tags:
         - Orders
@@ -288,6 +600,100 @@ paths:
         '500':
           $ref: '#/components/responses/FailedSeverError'
 
+  /orders/{id}:
+    put:
+      tags:
+      - Orders
+      summary: Update order details
+      description: Path link for user to modify order details
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          description: task id
+          in: path
+          schema:
+            type: integer
+            example: 1
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/orderSchema'
+            example:
+              alamat: ganti alamat jalan daerah
+              pembayaran:
+                nama: jadi orang kedua deh
+                nomorkartu: 0000-4444-1111-0000
+                cvv: 999
+                expired: 00/00
+              status: cancel
+      responses:
+        '200':
+          description: Berhasil mengubah detail orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                respon-berhasil:
+                  description: sukses memperbaharui detail order
+                  value: {
+                    code: 200,
+                    status: Success,
+                    message: Pemesanan dimodifikasi!
+                  }
+        '400':
+          description: Failed to modify order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              examples:
+                no-address:
+                  description: Respon gagal ketika alamat kosong
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Alamat tidak boleh kosong!,
+                  }
+                no-name:
+                  description: Respon gagal ketika nama pembayaran kosong
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Nama pembayar tidak boleh kosong!,
+                  }
+                invalid-number:
+                  description: Respon gagal ketika nomor kartu pembayaran tidak valid
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Periksa kembali nomor kartu!,
+                  }
+                no-cvv:
+                  description: Respon gagal ketika cvv dikosongkan
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: CVV kartu tidak boleh kosong!,
+                  }
+                no-expired:
+                  description: Respon gagal ketika tidak menginput expiracy date kartu
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Expired date tidak boleh kosong!,
+                  }
+                no-status:
+                  description: Respon gagal ketika status order dikosongkan
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Status order tidak boleh kosong!,
+                  }
 
 components:
   securitySchemes:
@@ -297,6 +703,17 @@ components:
       bearerFormat: JWT
       description: "use Token"
   schemas:
+    
+    responseForm:
+      type: object
+      properties: 
+        "code":
+          type: number
+        "message":
+          type: string
+        "status":
+          type: string
+      
     requestSignUp:
       type: object
       properties:
@@ -357,6 +774,53 @@ components:
         "status":
           type: string
           minLength: 1
+    
+    productSchema:
+      type: object
+      properties: 
+        "user_id":
+          type: integer
+        "nama":
+          type: string
+        
+        "kategori":
+          type: string
+        
+        "stok":
+          type: integer
+        
+        "harga":
+          type: integer
+        
+        "deskripsi":
+          type: string
+        
+        "gambar":
+          type: string
+        
+    orderSchema: 
+      type: object
+      properties:
+        id:
+          type: integer
+        tanggal:
+          type: string
+        alamat:
+          type: string
+        pembayaran:
+          type: object
+          properties:
+            nama:
+              type: string
+            nomorkartu:
+              type: string
+            cvv:
+              type: integer
+            expired:
+              type: string
+        status:
+          type: string
+
     successResponse:
       type: object
       properties: {
