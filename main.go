@@ -8,7 +8,6 @@ import (
 	"github.com/Sal-maa/E-Commerce-Project/router"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
-	"github.com/labstack/echo/v4"
 )
 
 func main() {
@@ -22,8 +21,9 @@ func main() {
 		panic(err)
 	}
 
-	e := echo.New()
-	router.UserRouter(e, db)
+	// e := echo.New()
+	// e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
+	e := router.UserRouter(db)
 
 	e.Logger.Fatal(e.Start(":8080"))
 
