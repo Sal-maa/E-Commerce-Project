@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Sal-maa/E-Commerce-Project/entity"
@@ -13,6 +14,8 @@ type UserService interface {
 	GetUserByNameService(name string) (entity.User, error)
 	LoginUserService(login entity.LoginUserRequest) (entity.User, error)
 	SaveTokenService(token string) (string, error)
+	GetUserByIdService(id int) (entity.User, error)
+	DeleteUserService(id int) (entity.User, error)
 }
 
 type userService struct {
@@ -66,4 +69,24 @@ func (s *userService) LoginUserService(login entity.LoginUserRequest) (entity.Us
 func (s *userService) SaveTokenService(token string) (string, error) {
 	sToken, err := s.repository.SaveToken(token)
 	return sToken, err
+}
+
+func (s *userService) GetUserByIdService(id int) (entity.User, error) {
+	user, err := s.repository.GetUser(id)
+	if err != nil {
+		fmt.Println(err)
+		return user, err
+	}
+	return user, nil
+}
+
+func (s *userService) DeleteUserService(id int) (entity.User, error) {
+	userID, err := s.GetUserByIdService(id)
+	if err != nil {
+		return userID, err
+	}
+
+	userID.DeletedAt = time.Now()
+	deleteUser, err := s.repository.DeleteUser(userID)
+	return deleteUser, err
 }

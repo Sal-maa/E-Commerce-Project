@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/Sal-maa/E-Commerce-Project/entity"
 	"github.com/Sal-maa/E-Commerce-Project/helper"
@@ -31,7 +32,7 @@ func (h *userHandler) CreateUserController(c echo.Context) error {
 		fmt.Println(err)
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to insert data"))
 	}
-	return c.JSON(http.StatusOK, helper.SuccessWithoutDataResponses("success insert data"))
+	return c.JSON(http.StatusCreated, helper.SuccessWithoutDataResponses("success insert data"))
 }
 
 func (h *userHandler) AuthController(c echo.Context) error {
@@ -58,4 +59,36 @@ func (h *userHandler) AuthController(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, helper.FailedResponses("cannot save token"))
 	}
 	return c.JSON(http.StatusOK, helper.SuccessResponses("login success", saveToken))
+}
+
+func (h *userHandler) GetUserController(c echo.Context) error {
+	idParam, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("data not found"))
+	}
+
+	user, err := h.userService.GetUserByIdService(idParam)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.InternalServerError("failed to fetch data"))
+	}
+
+	formatRes := entity.FormatUserResponse(user)
+	return c.JSON(http.StatusOK, helper.SuccessResponses("success to read data", formatRes))
+}
+
+func (h *userHandler) DeleteUserController(c echo.Context) error {
+	idParam, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed convert id"))
+	}
+
+	user, err1 := h.userService.DeleteUserService(idParam)
+	if err1 != nil {
+		fmt.Println(err1)
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed delete data"))
+	}
+	formatRes := entity.FormatUserResponse(user)
+	return c.JSON(http.StatusOK, helper.SuccessResponses("Success delete data", formatRes))
 }

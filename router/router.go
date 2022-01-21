@@ -22,7 +22,7 @@ func UserRouter(e *echo.Echo, db *sql.DB) {
 	e.POST("/login", userHandler.AuthController)
 	e.POST("/users", userHandler.CreateUserController)
 	// e.GET("/users", middleware.AuthMiddleware(authService, userService, userHandler.GetUsersController))
-	// e.GET("/users/:id", middleware.AuthMiddleware(authService, userService, userHandler.GetUserController))
+	e.GET("/users/:id", middleware.AuthMiddleware(authService, userService, userHandler.GetUserController))
 	// e.PUT("/users/:id", middleware.AuthMiddleware(authService, userService, userHandler.UpdateUserController))
-	// e.DELETE("/users/:id", middleware.AuthMiddleware(authService, userService, userHandler.DeleteUserController))
+	e.DELETE("/users/:id", middleware.AuthMiddleware(authService, userService, userHandler.DeleteUserController))
 }

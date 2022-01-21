@@ -12,6 +12,8 @@ type UserRepository interface {
 	GetIdByName(name string) (entity.User, error)
 	Login(name string) (entity.User, error)
 	SaveToken(token string) (string, error)
+	GetUser(idParam int) (entity.User, error)
+	DeleteUser(user entity.User) (entity.User, error)
 }
 
 type userRepository struct {
@@ -81,4 +83,33 @@ func (r *userRepository) Login(name string) (entity.User, error) {
 func (r *userRepository) SaveToken(token string) (string, error) {
 	_, err := r.db.Exec("INSERT INTO jwt_token(token) VALUES(?)", token)
 	return token, err
+}
+
+func (r *userRepository) GetUser(idParam int) (entity.User, error) {
+	var user entity.User
+	result, err := r.db.Query("SELECT id, name, email, password, address, phone FROM users WHERE id=?", idParam)
+	if err != nil {
+		fmt.Println("failed in query", err)
+	}
+
+	defer result.Close()
+
+	if isExist := result.Next(); !isExist {
+		fmt.Println("data not found", err)
+	}
+
+	errScan := result.Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.Address, &user.Phone)
+	if errScan != nil {
+		fmt.Println("failed to read data", errScan)
+	}
+
+	if idParam == user.Id {
+		return user, nil
+	}
+	return user, fmt.Errorf("user not found")
+}
+
+func (r *userRepository) DeleteUser(user entity.User) (entity.User, error) {
+	_, err := r.db.Exec("UPDATE users SET deleted_at=? WHERE id=?", user.DeletedAt, user.Id)
+	return user, err
 }
