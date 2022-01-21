@@ -21,6 +21,5 @@ jobs:
           git pull origin main
           docker stop ecommerce
           docker rm ecommerce
-          cd program
           docker build -t e-commerce-app:latest .
           docker run -d -e "HTTP_PORT=:80" -p 80:80 --name ecommerce e-commerce-app:latest
