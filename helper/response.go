@@ -13,7 +13,7 @@ func SuccessResponses(message string, data interface{}) map[string]interface{} {
 
 func SuccessWithoutDataResponses(message string) map[string]interface{} {
 	return map[string]interface{}{
-		"code":    http.StatusOK,
+		"code":    http.StatusCreated,
 		"status":  "success",
 		"message": message,
 	}
@@ -30,6 +30,14 @@ func FailedResponses(message string) map[string]interface{} {
 func UnauthorizedResponses(message string) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusUnauthorized,
+		"status":  "failed",
+		"message": message,
+	}
+}
+
+func InternalServerError(message string) map[string]interface{} {
+	return map[string]interface{}{
+		"code":    http.StatusInternalServerError,
 		"status":  "failed",
 		"message": message,
 	}

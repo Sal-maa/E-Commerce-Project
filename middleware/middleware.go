@@ -1,10 +1,11 @@
-package middlerware
+package middleware
 
 import (
 	"net/http"
 	"strings"
 
 	"github.com/Sal-maa/E-Commerce-Project/helper"
+	"github.com/Sal-maa/E-Commerce-Project/service"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )

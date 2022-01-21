@@ -1,0 +1,1341 @@
+openapi: 3.0.3
+info:
+  title: E-COMMERCE PROJECT
+  description: this is a simple open api e-commerce app
+  version: 1.0.1
+
+servers:
+  - description: SwaggerHub Auto Mocking
+    url: https://sirclo-1-e-commerce.com
+    variables:
+      environment:
+        default: dev
+        enum:
+          - prod
+          - dev 
+
+tags:
+  - name: Auth
+    description: Authentication
+  - name: Users
+    description: User control
+  - name: Products
+    description: Products control
+  - name: Carts
+    description: Carts control
+  - name: Orders
+    description: Orders control
+
+paths:
+  /login:
+    post:
+      tags:
+        - Auth
+      summary: User login
+      description: Path link for user to login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  minLength: 1
+                  example: testlogin@login.com
+                password:
+                  type: string
+                  minLength: 1
+                  example: loginpassword
+      responses:
+        '200':
+          description: User login success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                  code: 200,
+                  status: Success,
+                  message: Berhasil login!,
+                  data: {
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2MzgzMjYxODAsInVzZXJJZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.AebFR-oQjUSOMez2ucDWkiMrS2eQIPmcYm5c71qZ_co
+                  }
+                  
+        '400':
+          description: User login failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                  code: 400,
+                  status: Failed,
+                  message: Email tak terdaftar!,
+                
+
+  /signup:
+    post:
+      tags:
+        - Users
+      summary: sign up
+      description: sign up user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/requestSignUp'
+            examples:
+              userData:
+                description: Example data user
+                value: {
+                  username: "User1",
+                  email: "user@todo.com",
+                  password: "user1",
+                  address: "Surabaya",
+                  phone: 0123456789
+                }
+      responses:
+        '201':
+          $ref: '#/components/responses/signUpSuccess'
+        '400':
+          $ref: '#/components/responses/FailedBinding'
+        '500':
+          $ref: '#/components/responses/FailedSeverError'
+  
+  
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user's information
+      description: Path link for user to get personal information
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          description: user id
+          in: path
+          schema:
+            type: integer
+            example: 1
+          required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/getUserByIdSuccess'
+        '400':
+          description: Failed to create user account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                id-outofscope:
+                  description: Respon gagal ketika salah memasukan id
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: User id di luar batas!,
+                  }
+
+    
+    put:
+      tags:
+        - Users
+      description: Edit user profile
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          description: id user
+          in: path
+          schema:
+            type: integer
+            example: 1
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: user1 update
+                email:
+                  type: string
+                  example: user1_update@todo.com
+                password:
+                  type: string
+                  example: user1baru
+                address:
+                  type: string
+                  example: Malang
+                phone:
+                  type: integer
+                  example: 0987654321
+      responses:
+        '201':
+          $ref: '#/components/responses/responseUpdateSuccess'
+        '404':
+          $ref: '#/components/responses/DataNotFound'
+        '400':
+          $ref: '#/components/responses/FailedBinding'
+        '500':
+          $ref: '#/components/responses/FailedSeverError'
+         
+    delete:
+      tags:
+        - Users
+      description: Delete User by ID
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          description: id user
+          in: path
+          schema:
+            type: integer
+            example: 1
+          required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/responseDeleteSuccess'
+        '400':
+          $ref: '#/components/responses/responseDeleteFailed'
+        '404':
+          $ref: '#/components/responses/DataNotFound'
+        '500':
+          $ref: '#/components/responses/FailedSeverError'
+
+  /products:
+    get:
+      tags:
+        - Products
+      description: Get All Products
+      responses:
+        '200':
+          $ref: '#/components/responses/getAllProductSuccess'
+        '400':
+          $ref: '#/components/responses/getProductsFailed'
+
+    post:
+      tags:
+        - Products
+      summary: Create product
+      description: Path link for user to create new product
+      security:
+        - JWTAuth: []
+      
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/productSchema'
+            example:
+              product-one:
+                description: "Contoh pembuatan produk pertama"
+                value: {
+                  user_id: 12,
+                  nama: produk pertama,
+                  kategori: barang,
+                  stok: 200,
+                  harga: 10000,
+                  deskripsi: barang ini merupakan barang pertama group project,
+                  gambar: www.google.image.com
+                }
+      responses:
+        '200':
+          description: Berhasil membuat produk
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                respon-berhasil:
+                  description: sukses membuat produk
+                  value: {
+                    code: 200,
+                    status: Success,
+                    message: Produk telah dibuat!
+                  }
+        '400':
+          description: Failed to create product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              examples:
+                stock-zero:
+                  description: Respon gagal ketika stok dimuat nol
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Tidak dapat membuat produk apabila stok kosong!,
+                  }
+                price-zero:
+                  description: Respon gagal ketika harga dimuat nol
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Tidak dapat membuat produk dengan harga 0 atau gratis!,
+                  }
+        '500':
+          $ref: '#/components/responses/FailedSeverError'
+  /products/{id}:
+    get:
+      tags:
+        - Products
+      description: Get All Products
+      parameters:
+        - name: id
+          description: id product
+          in: path
+          schema:
+            type: integer
+            example: 1
+          required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/getProductSuccess'
+        '400':
+          $ref: '#/components/responses/getProductsFailed'
+
+    put:
+      tags:
+        - Products
+      summary: Modify product
+      description: Path link for user to modify new product
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          description: user id
+          in: path
+          schema:
+            type: integer
+            example: 1
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/productSchema'
+            example:
+              nama: Produk 1 ubah nama
+              kategori: jasa
+              stok: 900
+              harga: 2233000
+              deskripsi: Mengubah detail produk 1
+              gambar: www.google.image.com
+      responses:
+        '200':
+          description: Berhasil mengubah detail produk
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                respon-berhasil:
+                  description: sukses memperbaharui produk
+                  value: {
+                    code: 200,
+                    status: Success,
+                    message: Produk telah dimodifikasi!
+                  }
+        '400':
+          description: Failed to modify product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              examples:
+                stock-zero:
+                  description: Respon gagal ketika stok dimuat nol
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Tidak dapat mengubah produk apabila stok kosong!,
+                  }
+                price-zero:
+                  description: Respon gagal ketika harga dimuat nol
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Tidak dapat membuat produk dengan harga 0 atau gratis!,
+                  }
+        '500':
+          $ref: '#/components/responses/FailedSeverError'
+
+    delete:
+      tags:
+        - Products
+      summary: Delete product
+      description: Path link for user to delete product
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          description: user id
+          in: path
+          schema:
+            type: integer
+            example: 1
+          required: true
+      responses:
+        '200':
+          description: Product deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                success:
+                  description: Respon sukses ketika produk dihapus
+                  value: {
+                    code: 200,
+                    status: Success,
+                    message: Produk dihapus!,
+                  }
+        '400':
+          description: Produk deletion failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                id-outofscope:
+                  description: Respon gagal ketika salah memasukan id
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Product id di luar batas!,
+                  }
+
+  /carts:
+    post:
+      tags:
+        - Carts
+      summary: create carts
+      description: create carts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/requestCart'
+            examples:
+              userData:
+                description: Example data carts
+                value: {
+                  product_id: 19,
+                  quantity: 2,
+                  subtotal: 12000
+                }
+      responses:
+        '201':
+          $ref: '#/components/responses/CreateCartSuccess'
+        '400':
+          $ref: '#/components/responses/FailedBinding'
+        '500':
+          $ref: '#/components/responses/FailedSeverError'
+    get:
+      tags:
+        - Carts
+      description: Get All Carts
+      responses:
+        '200':
+          $ref: '#/components/responses/getAllCartSuccess'
+        '400':
+          $ref: '#/components/responses/getCartFailed'
+  /carts/{id}:
+    put:
+      tags:
+        - Carts
+      description: Edit cart
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          description: id cart
+          in: path
+          schema:
+            type: integer
+            example: 1
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                  example: 17
+      responses:
+        '201':
+          $ref: '#/components/responses/responseUpdateSuccess'
+        '404':
+          $ref: '#/components/responses/DataNotFound'
+        '400':
+          $ref: '#/components/responses/FailedBinding'
+        '500':
+          $ref: '#/components/responses/FailedSeverError'
+         
+    delete:
+      tags:
+        - Carts
+      description: Delete Carts by ID
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          description: id cart
+          in: path
+          schema:
+            type: integer
+            example: 1
+          required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/responseDeleteSuccess'
+        '400':
+          $ref: '#/components/responses/responseDeleteFailed'
+        '404':
+          $ref: '#/components/responses/DataNotFound'
+        '500':
+          $ref: '#/components/responses/FailedSeverError'
+  /orders:
+    get:
+      tags:
+      - Orders
+      summary: Get all order details
+      description: Path link for user to create new product
+      security:
+        - JWTAuth: []
+      responses:
+        '200':
+          description: Success get orders data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/orderSchema'
+              example:
+                id: 2
+                tanggal: 20-01-2022
+                alamat: jalan raya nasional km.0
+                pembayaran:
+                  nama: si bayar
+                  nomorkartu: 0000-1111-2222-3333
+                  cvv: 007
+                  expired: 12/21
+                status: cancel
+        '400':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                code: 400
+                status: Failed
+                message: Product id di luar batas!
+
+    post:
+      tags:
+        - Orders
+      summary: create Orders
+      description: create Orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/requestOrder'
+            examples:
+              userData:
+                description: Example data carts
+                value: {
+                  cart_id: [12,55],
+                  address: {
+                    street: gajah mada street,
+                    city: shrimp city,
+                    state: Indonesia,
+                    zip: 1234
+                    },
+                  payment method: {
+                    name: Ron,
+                    card_number: 1234-1234-1234-1234,
+                    cvv: 123,
+                    exp_date: 12/2030
+                    },
+                  transaction date: "31 jan 2022",
+                  total: 99000,
+                  status: "OK"
+                }
+      responses:
+        '201':
+          $ref: '#/components/responses/CreateOrderSuccess'
+        '400':
+          $ref: '#/components/responses/FailedBinding'
+        '500':
+          $ref: '#/components/responses/FailedSeverError'
+
+  /orders/{id}:
+    put:
+      tags:
+      - Orders
+      summary: Update order details
+      description: Path link for user to modify order details
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          description: task id
+          in: path
+          schema:
+            type: integer
+            example: 1
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/orderSchema'
+            example:
+              alamat: ganti alamat jalan daerah
+              pembayaran:
+                nama: jadi orang kedua deh
+                nomorkartu: 0000-4444-1111-0000
+                cvv: 999
+                expired: 00/00
+              status: cancel
+      responses:
+        '200':
+          description: Berhasil mengubah detail orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              example:
+                respon-berhasil:
+                  description: sukses memperbaharui detail order
+                  value: {
+                    code: 200,
+                    status: Success,
+                    message: Pemesanan dimodifikasi!
+                  }
+        '400':
+          description: Failed to modify order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseForm'
+              examples:
+                no-address:
+                  description: Respon gagal ketika alamat kosong
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Alamat tidak boleh kosong!,
+                  }
+                no-name:
+                  description: Respon gagal ketika nama pembayaran kosong
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Nama pembayar tidak boleh kosong!,
+                  }
+                invalid-number:
+                  description: Respon gagal ketika nomor kartu pembayaran tidak valid
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Periksa kembali nomor kartu!,
+                  }
+                no-cvv:
+                  description: Respon gagal ketika cvv dikosongkan
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: CVV kartu tidak boleh kosong!,
+                  }
+                no-expired:
+                  description: Respon gagal ketika tidak menginput expiracy date kartu
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Expired date tidak boleh kosong!,
+                  }
+                no-status:
+                  description: Respon gagal ketika status order dikosongkan
+                  value: {
+                    code: 400,
+                    status: Failed,
+                    message: Status order tidak boleh kosong!,
+                  }
+
+components:
+  securitySchemes:
+    JWTAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "use Token"
+  schemas:
+    
+    responseForm:
+      type: object
+      properties: 
+        "code":
+          type: number
+        "message":
+          type: string
+        "status":
+          type: string
+      
+    requestSignUp:
+      type: object
+      properties:
+        "username":
+          type: string
+          minLength: 1
+        "email":
+          type: string
+          minLength: 1
+        "password":
+          type: string
+          minLength: 1
+        "address":
+          type: string
+          minLength: 1
+        "phone":
+          type: integer
+          minLength: 1
+    requestLogin:
+      type: object
+      properties:
+        "username":
+          type: string
+          minLength: 1
+        "password":
+          type: string
+          minLength: 1
+    requestCart:
+      type: object
+      properties:
+        "product_id":
+          type: integer
+          minLength: 1
+        "quantity":
+          type: integer
+          minLength: 1
+        "subtotal":
+          type: integer
+          minLength: 1
+    requestOrder:
+      type: object
+      properties:
+        "cart_id":
+          type: array
+          items:
+            type: integer
+          minLength: 1
+        "address":
+          type: object
+          minLength: 1
+        "payment method":
+          type: object
+          minLength: 1
+        "transaction date":
+          type: string
+          minLength: 1
+        "total":
+          type: integer
+          minLength: 1
+        "status":
+          type: string
+          minLength: 1
+    
+    productSchema:
+      type: object
+      properties: 
+        "user_id":
+          type: integer
+        "nama":
+          type: string
+        
+        "kategori":
+          type: string
+        
+        "stok":
+          type: integer
+        
+        "harga":
+          type: integer
+        
+        "deskripsi":
+          type: string
+        
+        "gambar":
+          type: string
+        
+    orderSchema: 
+      type: object
+      properties:
+        id:
+          type: integer
+        tanggal:
+          type: string
+        alamat:
+          type: string
+        pembayaran:
+          type: object
+          properties:
+            nama:
+              type: string
+            nomorkartu:
+              type: string
+            cvv:
+              type: integer
+            expired:
+              type: string
+        status:
+          type: string
+
+    successResponse:
+      type: object
+      properties: {
+        "code":{
+          type: number
+        },
+        "message": {
+          type: string
+        },
+        "status": {
+          type: string
+        }
+      }
+    failedResponse:
+      type: object
+      properties: {
+        "code":{
+          type: number
+        },
+        "message": {
+          type: string
+        },
+        "status": {
+          type: string
+        }
+      }
+
+  responses:
+    #==================================#
+    #    RESPONSE FOR GENERAL REQUEST
+    #==================================#
+    responseSuccess:
+      description: Successful Operation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 200
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Successful Operation
+    responseFailed:
+      description: Failed Operation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 400
+              status:
+                type: string
+                example: failed
+              message:
+                type: string
+                example: Bad Request
+    FailedBinding:
+        description: Failed binding request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: number
+                  example: 400
+                status:
+                  type: string
+                  example: Fail
+                message:
+                  type: string
+                  example: failed to bind data
+    FailedSeverError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 500
+              status:
+                type: string
+                example: Fail
+              message:
+                type: string
+                example: Internal Server Error
+    DataNotFound:
+      description: Data Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 404
+              status:
+                type: string
+                example: failed
+              message:
+                type: string
+                example: data not found
+    
+    #==================================#
+    #    RESPONSE FOR UPDATE REQUEST
+    #==================================#
+    responseUpdateSuccess:
+      description: Success Update Data
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 201
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Update Data
+    responseUpdateFailed:
+      description: update failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 400
+              status:
+                type: string
+                example: failed
+              message:
+                type: string
+                example: Bad Request
+
+    #==================================#
+    #    RESPONSE FOR DELETE REQUEST
+    #==================================#
+    responseDeleteSuccess:
+      description: Success Delete Data
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 201
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Success Delete Data
+    responseDeleteFailed:
+      description: Delete failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 400
+              status:
+                type: string
+                example: failed
+              message:
+                type: string
+                example: Failed Delete Data
+
+    #==================================#
+    #    RESPONSE SIGN UP USER
+    #==================================#
+    signUpSuccess:
+      description: signUp success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 201
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: signUp Success
+              data:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: user1
+                  address:
+                    type: string
+                    example: Surabaya
+                  phone:
+                    type: integer
+                    example: 0123456789
+
+    #==================================#
+    #    RESPONSE LOGIN USER
+    #==================================#
+    loginSuccess:
+      description: login success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 200
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Login Success
+              data:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJ1c2VySWQiOjExfQ.YQ47sxFkIfbDVyQ5o6ix38w4BYxnNOPG3F5isqkyyv8
+    loginFailed:
+      description: login failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 400
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: Login Failed. Wrong Email and Password
+   
+    #==================================#
+    #    RESPONSE GET USER BY ID
+    #==================================#
+    getUserByIdSuccess:
+      description: getUserById success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 200
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: getUserById Success
+              data:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: user1
+                  address:
+                    type: string
+                    example: Surabaya
+    getUserByIdFailed:
+      description: getUserById failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 400
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: getUserById Failed.
+    
+    #==================================#
+    #    RESPONSE GET PRODUCT
+    #==================================#
+    getAllProductSuccess:
+      description: get All Product success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 200
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: get all products Success
+              data: 
+                type: array
+                items:
+                  type: object
+                example: [
+                  {
+                    name: candy,
+                    stock: 87,
+                    price: 1000,
+                    gambar: www.gambar.com,
+                    deskripsi: permen enak,
+                    kategori: food
+                  }
+                ]
+    getProductSuccess:
+      description: get Product success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 200
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: get product products Success
+              data:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: candy
+                  stock:
+                    type: integer
+                    example: 87
+                  price:
+                    type: integer
+                    example: 1000
+                  gambar:
+                    type: string
+                    example: www.gambar.com
+                  deskripsi:
+                    type: string
+                    example: permen enak
+                  kategori:
+                    type: string
+                    example: food
+    getProductsFailed:
+      description: get product failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 400
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: get product Failed.
+
+    #==================================#
+    #    RESPONSE CREATE CART 
+    #==================================#
+    CreateCartSuccess:
+      description: create cart success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 201
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: create cart Success
+              data:
+                type: object
+                properties:
+                  product_id:
+                    type: integer
+                    example: 19
+                  quantity:
+                    type: integer
+                    example: 2
+                  subtotal:
+                    type: integer
+                    example: 12000
+    getAllCartSuccess:
+      description: get All Cart success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 200
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: get all Carts Success
+              data: 
+                type: array
+                items:
+                  type: object
+                example: [
+                  {
+                    product_id: 19,
+                    quantity: 2,
+                    subtotal: 12000
+                  }
+                ]
+    getCartFailed:
+      description: get cart failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 400
+              status:
+                type: string
+                example: fail
+              message:
+                type: string
+                example: get cart Failed.
+    #==================================#
+    #    RESPONSE CREATE ORDER 
+    #==================================#
+    CreateOrderSuccess:
+      description: create order success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 201
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: create order Success
+              data:
+                type: object
+                properties:
+                  cart_id:
+                    type: array
+                    items:
+                      type: integer
+                    example: [12,55]
+                  address:
+                    type: object
+                    example: {
+                     street: gajah mada street,
+                     city: shrimp city,
+                     state: Indonesia,
+                     zip: 1234
+                     }
+                  payment method:
+                    type: object
+                    example: {
+                     name: Ron,
+                     card_number: 1234-1234-1234-1234,
+                     cvv: 123,
+                     exp_date: 12/2030
+                     }
+                  total:
+                    type: integer
+                    example: 99000
+                  status:
+                    type: string
+                    example: OK
+    CreateOrderFailed:
+      description: CreateOrder failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 400
+              status:
+                type: string
+                example: Fail
+              message:
+                type: string
+                example: CreateOrder Failed

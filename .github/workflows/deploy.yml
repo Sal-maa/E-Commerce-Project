@@ -1,0 +1,25 @@
+name: Deploy to EC2
+on: 
+  push:
+    branches:
+      - main
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to EC2 using SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+          cd /home/ubuntu/app
+          git pull origin main
+          docker stop ecommerce
+          docker rm ecommerce
+          docker build -t e-commerce-app:latest .
+          docker run -d -e "HTTP_PORT=:80" -p 80:80 --name ecommerce e-commerce-app:latest
