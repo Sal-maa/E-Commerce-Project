@@ -17,6 +17,7 @@ type UserService interface {
 	SaveTokenService(token string) (string, error)
 	GetUserByIdService(id int) (entity.User, error)
 	DeleteUserService(id int) (entity.User, error)
+	UpdateUserService(id int, user entity.EditUserRequest) (entity.User, error)
 }
 
 type userService struct {
@@ -95,4 +96,30 @@ func (s *userService) DeleteUserService(id int) (entity.User, error) {
 	userID.DeletedAt = time.Now()
 	deleteUser, err := s.repository.DeleteUser(userID)
 	return deleteUser, err
+}
+
+func (s *userService) UpdateUserService(id int, userUpdate entity.EditUserRequest) (entity.User, error){
+	user, err := s.GetUserByIdService(id)
+	if err != nil {
+		return user, err
+	}
+	
+	//user := entity.User{}
+	user.UpdatedAt = time.Now()
+	user.Address = userUpdate.Address
+	user.Name = userUpdate.Name
+	user.Email = userUpdate.Email
+	user.Phone = userUpdate.Phone
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(userUpdate.Password), bcrypt.MinCost)
+	
+	if err != nil {
+		return user, err
+	}
+	user.Password = string(passwordHash)
+
+	updateUser, err := s.repository.UpdateUser(user)
+	
+	fmt.Println(user)
+	
+	return updateUser, err 
 }

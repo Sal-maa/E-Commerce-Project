@@ -15,6 +15,7 @@ type UserRepository interface {
 	SaveToken(token string) (string, error)
 	GetUser(idParam int) (entity.User, error)
 	DeleteUser(user entity.User) (entity.User, error)
+	UpdateUser(user entity.User) (entity.User, error)
 }
 
 type userRepository struct {
@@ -133,4 +134,13 @@ func (r *userRepository) GetUser(idParam int) (entity.User, error) {
 func (r *userRepository) DeleteUser(user entity.User) (entity.User, error) {
 	_, err := r.db.Exec("UPDATE users SET deleted_at=? WHERE id=?", user.DeletedAt, user.Id)
 	return user, err
+}
+
+func (r *userRepository) UpdateUser(user entity.User) (entity.User, error) {
+	_, err := r.db.Exec("UPDATE users SET updated_at = ?, name = ?, email = ?, password = ?, address = ?, phone = ? WHERE id = ?", user.UpdatedAt, user.Name, user.Email, user.Password, user.Address, user.Phone, user.Id)
+	if err != nil{
+		return user, err
+	}
+	return user, nil
+
 }
