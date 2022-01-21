@@ -8,6 +8,7 @@ import (
 )
 
 type UserRepository interface {
+	CheckUser(userChecked entity.CreateUserRequest) (entity.User, error)
 	CreateUser(user entity.User) (entity.User, error)
 	GetIdByName(name string) (entity.User, error)
 	Login(name string) (entity.User, error)
@@ -22,6 +23,26 @@ type userRepository struct {
 
 func NewUserRepository(db *sql.DB) *userRepository {
 	return &userRepository{db}
+}
+
+func (r *userRepository) CheckUser(userChecked entity.CreateUserRequest) (entity.User, error) {
+	user := entity.User{}
+	result, err := r.db.Query("SELECT name FROM users WHERE name=?", userChecked.Name)
+	if err != nil {
+		return user, err
+	}
+	defer result.Close()
+
+	if isExist := result.Next(); isExist {
+		return user, fmt.Errorf("user already exist")
+	}
+
+	if user.Name != userChecked.Name {
+		// usernya belum ada
+		return user, nil
+	}
+
+	return user, nil
 }
 
 func (r *userRepository) CreateUser(user entity.User) (entity.User, error) {
