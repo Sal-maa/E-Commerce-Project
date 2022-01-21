@@ -27,6 +27,13 @@ func (h *userHandler) CreateUserController(c echo.Context) error {
 		fmt.Println(err)
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to bind data"))
 	}
+
+	_, err1 := h.userService.CheckUserName(userCreate)
+	if err1 != nil {
+		fmt.Println(err1)
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("username already exist"))
+	}
+
 	_, err := h.userService.CreateUserService(userCreate)
 	if err != nil {
 		fmt.Println(err)

@@ -10,6 +10,7 @@ import (
 )
 
 type UserService interface {
+	CheckUserName(userCreate entity.CreateUserRequest) (entity.User, error)
 	CreateUserService(userCreate entity.CreateUserRequest) (entity.User, error)
 	GetUserByNameService(name string) (entity.User, error)
 	LoginUserService(login entity.LoginUserRequest) (entity.User, error)
@@ -25,6 +26,11 @@ type userService struct {
 
 func NewUserService(repository repo.UserRepository) *userService {
 	return &userService{repository}
+}
+
+func (s *userService) CheckUserName(userCreate entity.CreateUserRequest) (entity.User, error) {
+	userChecked, err := s.repository.CheckUser(userCreate)
+	return userChecked, err
 }
 
 func (s *userService) CreateUserService(userCreate entity.CreateUserRequest) (entity.User, error) {
