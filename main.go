@@ -16,7 +16,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	connectionString := os.Getenv("DB_CONNECTION")
+	connectionString := os.Getenv("DB_CONNECTION_STRING")
 	db, err := helper.InitDB(connectionString)
 	if err != nil {
 		panic(err)
