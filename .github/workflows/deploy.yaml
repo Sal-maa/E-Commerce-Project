@@ -1,0 +1,24 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  JWT_SECRET: ${{secret.JWT_SECRET}}
+  DB_USERNAME: ${{secret.DB_USERNAME}}
+  DB_PASSWORD: ${{secret.DB_PASSWORD}}
+  DB_HOST: ${{secret.DB_HOST}}
+  DB_PORT: ${{secret.DB_PORT}}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: appleboy/ssh-action@master
+        with:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          KEY: ${{ secrets.KEY }}
+          PORT: ${{ secrets.PORT }}
