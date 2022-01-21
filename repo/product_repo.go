@@ -10,6 +10,8 @@ import (
 type ProductRepository interface {
 	GetAllProducts() ([]entity.Product, error)
 	GetProductById(id int) (entity.Product, error)
+	UpdateProduct(product entity.Product) (entity.Product, error)
+	DeleteProduct(product entity.Product) (entity.Product, error)
 }
 
 type productRepository struct {
@@ -19,8 +21,6 @@ type productRepository struct {
 func NewProductRepository(db *sql.DB) *productRepository {
 	return &productRepository{db}
 }
-
-
 
 func (r *productRepository) GetAllProducts() ([]entity.Product, error) {
 	products := []entity.Product{}
@@ -44,7 +44,7 @@ func (r *productRepository) GetAllProducts() ([]entity.Product, error) {
 	return products, err
 }
 
-func (r *productRepository) GetProductById(id int) (entity.Product, error){
+func (r *productRepository) GetProductById(id int) (entity.Product, error) {
 	product := entity.Product{}
 	result, err := r.db.Query("SELECT id, name, deskripsi, gambar, harga, stock, category_id, user_id FROM products WHERE id = ?", id)
 	if err != nil {
@@ -64,4 +64,14 @@ func (r *productRepository) GetProductById(id int) (entity.Product, error){
 		return product, nil
 	}
 	return product, fmt.Errorf("product not found")
+}
+
+func (r *productRepository) UpdateProduct(product entity.Product) (entity.Product, error) {
+	_, err := r.db.Exec("UPDATE products SET updated_at=?, name=?, deskripsi=?, harga=?, stock=?, category_id=? WHERE id=?", product.UpdatedAt, product.Name, product.Deskripsi, product.Gambar, product.Harga, product.Stock, product.CategoryId, product.Id)
+	return product, err
+}
+
+func (r *productRepository) DeleteProduct(product entity.Product) (entity.Product, error) {
+	_, err := r.db.Exec("UPDATE products SET deleted_at=? WHERE id=?", product.DeletedAt, product.Id)
+	return product, err
 }

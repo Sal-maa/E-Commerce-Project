@@ -35,13 +35,14 @@ func UserRouter(e *echo.Echo, db *sql.DB) {
 	// e.PUT("/carts/:id", middleware.AuthMiddleware(authService, userService, cartHandler.UpdateCartController))
 	// e.DELETE("/carts/:id", middleware.AuthMiddleware(authService, userService, cartHandler.DeleteCartController))
 
-
 	// Route product
 	productRepository := repo.NewProductRepository(db)
 	productService := service.NewProductService(productRepository)
 	productHandler := handler.NewProductHandler(productService)
 
-	e.GET("/products", middleware.AuthMiddleware(authService, userService, productHandler.GetAllProductsController))
-	e.GET("/products/:id",  middleware.AuthMiddleware(authService, userService, productHandler.GetProductByIdController))
+	e.GET("/products", productHandler.GetAllProductsController)
+	e.GET("/products/:id", productHandler.GetProductByIdController)
+	e.PUT("/products/:id", middleware.AuthMiddleware(authService, userService, productHandler.UpdateProductController))
+	e.DELETE("/products/:id", middleware.AuthMiddleware(authService, userService, productHandler.DeleteProductController))
 
 }
