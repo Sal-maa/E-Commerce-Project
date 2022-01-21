@@ -10,6 +10,7 @@ import (
 type ProductRepository interface {
 	GetAllProducts() ([]entity.Product, error)
 	GetProductById(id int) (entity.Product, error)
+	CreateProduct(userId int, product entity.Product) (entity.Product, error)
 	UpdateProduct(product entity.Product) (entity.Product, error)
 	DeleteProduct(product entity.Product) (entity.Product, error)
 }
@@ -73,5 +74,11 @@ func (r *productRepository) UpdateProduct(product entity.Product) (entity.Produc
 
 func (r *productRepository) DeleteProduct(product entity.Product) (entity.Product, error) {
 	_, err := r.db.Exec("UPDATE products SET deleted_at=? WHERE id=?", product.DeletedAt, product.Id)
+	return product, err
+}
+
+func (r *productRepository) CreateProduct(userId int, product entity.Product) (entity.Product, error){
+	_, err := r.db.Exec("INSERT INTO products(name, deskripsi, gambar, harga, stock, category_id, user_id) VALUE(?,?,?,?,?,?,?)", product.Name, product.Deskripsi, product.Gambar, product.Harga, product.Stock, product.CategoryId, userId)
+
 	return product, err
 }

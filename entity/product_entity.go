@@ -16,6 +16,7 @@ type Product struct {
 }
 
 type CreateProduct struct {
+	UserId     int    `json:"user_id" form:"user_id"`
 	CategoryId int    `json:"category_id" form:"category_id"`
 	Name       string `json:"name" form:"name"`
 	Deskripsi  string `json:"deskripsi" form:"deskripsi"`

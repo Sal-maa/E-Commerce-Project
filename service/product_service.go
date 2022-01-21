@@ -13,6 +13,7 @@ import (
 type ProductService interface {
 	GetAllProductsService() ([]entity.Product, error)
 	GetProductByIdService(id int) (entity.Product, error)
+	CreateProductService(userId int, product entity.CreateProduct) (entity.Product, error)
 	UpdateProductService(id int, productUpdate entity.EditProduct) (entity.Product, error)
 	DeleteProductService(id int) (entity.Product, error)
 }
@@ -69,4 +70,18 @@ func (s *productService) DeleteProductService(id int) (entity.Product, error) {
 	deleteProduct, err := s.repository.DeleteProduct(productID)
 
 	return deleteProduct, err
+}
+
+func (s *productService) CreateProductService(userId int, product entity.CreateProduct) (entity.Product, error){
+	produk := entity.Product{}
+	produk.Name = product.Name
+	produk.Deskripsi = product.Deskripsi
+	produk.Gambar = product.Gambar
+	produk.Harga = product.Harga
+	produk.Stock = product.Stock
+	produk.CategoryId = product.CategoryId
+	produk.UserId = userId
+
+	storedProduct, err := s.repository.CreateProduct(userId, produk)
+	return storedProduct, err
 }
