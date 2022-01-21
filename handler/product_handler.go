@@ -98,3 +98,20 @@ func (h *productHandler) DeleteProductController(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, helper.SuccessWithoutDataResponses("Success delete data"))
 }
+
+func (h *productHandler) CreateProductController(c echo.Context) error {
+	userInfo := c.Get("currentUser")
+	fmt.Println(userInfo.(entity.User).Id)
+	userId := userInfo.(entity.User).Id
+	newProduct := entity.CreateProduct{}
+	if err := c.Bind(&newProduct); err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to bind data"))
+	}
+	_, err := h.productService.CreateProductService(userId, newProduct)
+	if err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to insert data"))
+	}
+	return c.JSON(http.StatusCreated, helper.SuccessWithoutDataResponses("success insert data"))
+}
