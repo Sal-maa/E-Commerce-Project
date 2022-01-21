@@ -32,3 +32,18 @@ func (h *cartHandler) CreateCartController(c echo.Context) error {
 	}
 	return c.JSON(http.StatusCreated, helper.SuccessWithoutDataResponses("success insert data"))
 }
+
+func (h *cartHandler) GetAllCartsController(c echo.Context) error {
+	carts, err := h.cartService.GetAllCartsService()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.InternalServerError("failed to fetch data"))
+	}
+
+	data := []entity.CartResponse{}
+	for i := 0; i < len(carts); i++ {
+		formatRes := entity.FormatCartResponse(carts[i])
+		data = append(data, formatRes)
+	}
+
+	return c.JSON(http.StatusOK, helper.SuccessResponses("success to read data", data))
+}

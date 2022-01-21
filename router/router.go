@@ -31,7 +31,7 @@ func UserRouter(e *echo.Echo, db *sql.DB) {
 	cartHandler := handler.NewCartHandler(cartService)
 
 	e.POST("/carts", middleware.AuthMiddleware(authService, userService, cartHandler.CreateCartController))
-	// e.GET("/carts", middleware.AuthMiddleware(authService, userService,cartHandler.GetCartsController)
+	e.GET("/carts", middleware.AuthMiddleware(authService, userService, cartHandler.GetAllCartsController))
 	// e.PUT("/carts/:id", middleware.AuthMiddleware(authService, userService, cartHandler.UpdateCartController))
 	// e.DELETE("/carts/:id", middleware.AuthMiddleware(authService, userService, cartHandler.DeleteCartController))
 

@@ -28,7 +28,7 @@ func (r *productRepository) GetAllProducts() ([]entity.Product, error) {
 	result, err := r.db.Query("SELECT id, name, deskripsi, gambar, harga, stock, category_id, user_id FROM products")
 	if err != nil {
 		fmt.Println(err)
-		return products, fmt.Errorf("failed to scan")
+		return products, fmt.Errorf("failed in query")
 	}
 
 	defer result.Close()

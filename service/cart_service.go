@@ -9,6 +9,7 @@ import (
 
 type CartService interface {
 	CreateCartService(cartCreate entity.CreateCartRequest) (entity.Cart, error)
+	GetAllCartsService() ([]entity.Cart, error)
 }
 
 type cartService struct {
@@ -29,4 +30,12 @@ func (s *cartService) CreateCartService(cartCreate entity.CreateCartRequest) (en
 
 	createCart, err := s.repository.CreateCart(cart)
 	return createCart, err
+}
+
+func (s *cartService) GetAllCartsService() ([]entity.Cart, error) {
+	carts, err := s.repository.GetAllCarts()
+	if err != nil {
+		return carts, err
+	}
+	return carts, nil
 }
