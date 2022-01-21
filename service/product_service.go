@@ -11,6 +11,7 @@ import (
 
 type ProductService interface{
 	GetAllProductsService() ([]entity.Product, error)
+	GetProductByIdService(id int) (entity.Product, error)
 }
 
 type productService struct {
@@ -27,4 +28,12 @@ func (s *productService) GetAllProductsService() ([]entity.Product, error) {
 		return products, err
 	}
 	return products, nil
+}
+
+func (s *productService) GetProductByIdService(id int) (entity.Product, error){
+	product, err := s.repository.GetProductById(id)
+	if err != nil {
+		return product, err
+	}
+	return product, nil
 }
