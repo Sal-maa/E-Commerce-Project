@@ -1,16 +1,22 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"os"
 
 	"github.com/Sal-maa/E-Commerce-Project/helper"
 	"github.com/Sal-maa/E-Commerce-Project/router"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
-	connectionString := fmt.Sprintf("root:123456789@tcp(localhost:3306)/e-commerce?charset=utf8&parseTime=True&loc=Local")
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	connectionString := os.Getenv("DB_CONNECTION")
 	db, err := helper.InitDB(connectionString)
 	if err != nil {
 		panic(err)

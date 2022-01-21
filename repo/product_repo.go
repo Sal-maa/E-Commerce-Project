@@ -77,7 +77,7 @@ func (r *productRepository) DeleteProduct(product entity.Product) (entity.Produc
 	return product, err
 }
 
-func (r *productRepository) CreateProduct(userId int, product entity.Product) (entity.Product, error){
+func (r *productRepository) CreateProduct(userId int, product entity.Product) (entity.Product, error) {
 	_, err := r.db.Exec("INSERT INTO products(name, deskripsi, gambar, harga, stock, category_id, user_id) VALUE(?,?,?,?,?,?,?)", product.Name, product.Deskripsi, product.Gambar, product.Harga, product.Stock, product.CategoryId, userId)
 
 	return product, err
