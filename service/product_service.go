@@ -72,8 +72,10 @@ func (s *productService) DeleteProductService(id int) (entity.Product, error) {
 	return deleteProduct, err
 }
 
-func (s *productService) CreateProductService(userId int, product entity.CreateProduct) (entity.Product, error){
+func (s *productService) CreateProductService(userId int, product entity.CreateProduct) (entity.Product, error) {
 	produk := entity.Product{}
+	produk.CreatedAt = time.Now()
+	produk.UpdatedAt = time.Now()
 	produk.Name = product.Name
 	produk.Deskripsi = product.Deskripsi
 	produk.Gambar = product.Gambar

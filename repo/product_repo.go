@@ -78,7 +78,8 @@ func (r *productRepository) DeleteProduct(product entity.Product) (entity.Produc
 }
 
 func (r *productRepository) CreateProduct(userId int, product entity.Product) (entity.Product, error) {
-	_, err := r.db.Exec("INSERT INTO products(name, deskripsi, gambar, harga, stock, category_id, user_id) VALUE(?,?,?,?,?,?,?)", product.Name, product.Deskripsi, product.Gambar, product.Harga, product.Stock, product.CategoryId, userId)
+	_, err := r.db.Exec(`INSERT INTO products(created_at, updated_at, name, deskripsi, gambar, harga, stock, category_id, user_id) 
+						VALUE(?,?,?,?,?,?,?,?,?)`, product.CreatedAt, product.UpdatedAt, product.Name, product.Deskripsi, product.Gambar, product.Harga, product.Stock, product.CategoryId, userId)
 
 	return product, err
 }

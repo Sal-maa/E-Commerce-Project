@@ -4,6 +4,7 @@ import "time"
 
 type Product struct {
 	Id         int       `json:"id" form:"id"`
+	CreatedAt  time.Time `json:"created_at" form:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at" form:"updated_at"`
 	DeletedAt  time.Time `json:"deleted_at" form:"deleted_at"`
 	UserId     int       `json:"user_id" form:"user_id"`
