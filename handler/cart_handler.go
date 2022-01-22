@@ -81,3 +81,31 @@ func (h *cartHandler) DeleteCartController(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, helper.SuccessWithoutDataResponses("Success delete data"))
 }
+
+func (h *cartHandler) UpdateCartController(c echo.Context) error{
+	idParam, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed convert id"))
+	}
+	cartUpdate := entity.EditCartRequest{}
+	if err := c.Bind(&cartUpdate); err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to bind data"))
+	}
+
+	userId := c.Get("currentUser").(entity.User)
+	if cartUpdate.UserId != userId.Id {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("you dont have permission"))
+	}
+
+	updatedCart, err := h.cartService.UpdateCartService(idParam, cartUpdate)
+	if err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to update data"))
+	}
+
+	formatRes := entity.FormatCartResponse(updatedCart)
+	return c.JSON(http.StatusOK, helper.SuccessResponses("success update data", formatRes))
+
+}

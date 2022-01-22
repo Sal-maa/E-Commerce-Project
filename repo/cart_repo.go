@@ -12,6 +12,7 @@ type CartRepository interface {
 	GetAllCarts() ([]entity.Cart, error)
 	GetCartById(id int) (entity.Cart, error)
 	DeleteCart(cart entity.Cart) (entity.Cart, error)
+	UpdateCart(cart entity.Cart) (entity.Cart, error)
 }
 
 type cartRepository struct {
@@ -24,6 +25,11 @@ func NewCartRepository(db *sql.DB) *cartRepository {
 
 func (r *cartRepository) CreateCart(cart entity.Cart) (entity.Cart, error) {
 	_, err := r.db.Exec("INSERT INTO carts(created_at, updated_at, product_id, qty, subtotal) VALUES(?,?,?,?,?)", cart.CreatedAt, cart.UpdatedAt, cart.Product_Id, cart.Qty, cart.Subtotal)
+	return cart, err
+}
+
+func (r *cartRepository) UpdateCart(cart entity.Cart) (entity.Cart, error){
+	_, err := r.db.Exec("UPDATE carts SET updated_at = ?, qty = ?, subtotal = ? WHERE id = ?", cart.UpdatedAt, cart.Qty, cart.Subtotal, cart.Id)
 	return cart, err
 }
 
