@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/Sal-maa/E-Commerce-Project/entity"
 	"github.com/Sal-maa/E-Commerce-Project/helper"
@@ -28,6 +29,9 @@ func (h *userHandler) CreateUserController(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to bind data"))
 	}
 
+	if strings.Contains(userCreate.Username, " ") {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("username can't contain space"))
+	}
 	_, err1 := h.userService.CheckUserName(userCreate)
 	if err1 != nil {
 		fmt.Println(err1)
@@ -56,7 +60,7 @@ func (h *userHandler) AuthController(c echo.Context) error {
 	}
 
 	// membuat token
-	token, err := h.authService.GenerateToken(user.Name)
+	token, err := h.authService.GenerateToken(user.Username)
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(http.StatusInternalServerError, helper.FailedResponses("cannot create token"))
@@ -100,7 +104,7 @@ func (h *userHandler) DeleteUserController(c echo.Context) error {
 	return c.JSON(http.StatusOK, helper.SuccessResponses("Success delete data", formatRes))
 }
 
-func (h *userHandler) UpdateUserController(c echo.Context) error{
+func (h *userHandler) UpdateUserController(c echo.Context) error {
 	userUpdate := entity.EditUserRequest{}
 	if err := c.Bind(&userUpdate); err != nil {
 		fmt.Println(err)

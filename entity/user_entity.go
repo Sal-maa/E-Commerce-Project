@@ -3,7 +3,7 @@ package entity
 import "time"
 
 type LoginUserRequest struct {
-	Name     string `json:"name" form:"name"`
+	Username string `json:"username" form:"username"`
 	Password string `json:"password" form:"password"`
 }
 
@@ -22,7 +22,7 @@ type User struct {
 	CreatedAt time.Time `json:"created_at" form:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" form:"updated_at"`
 	DeletedAt time.Time `json:"deleted_at" form:"deleted_at"`
-	Name      string    `json:"name" form:"name"`
+	Username  string    `json:"username" form:"username" binding:"required,alpha"`
 	Email     string    `json:"email" form:"email"`
 	Password  string    `json:"password" form:"password"`
 	Address   string    `json:"address" form:"address"`
@@ -30,7 +30,7 @@ type User struct {
 }
 
 type CreateUserRequest struct {
-	Name     string `json:"name" form:"name"`
+	Username string `json:"username" form:"username"`
 	Email    string `json:"email" form:"email"`
 	Password string `json:"password" form:"password"`
 	Address  string `json:"address" form:"address"`
@@ -38,7 +38,7 @@ type CreateUserRequest struct {
 }
 
 type EditUserRequest struct {
-	Name     string `json:"name" form:"name"`
+	Username string `json:"username" form:"username"`
 	Email    string `json:"email" form:"email"`
 	Password string `json:"password" form:"password"`
 	Address  string `json:"address" form:"address"`
@@ -46,19 +46,19 @@ type EditUserRequest struct {
 }
 
 type UserResponse struct {
-	Id      int    `json:"id" form:"id"`
-	Name    string `json:"name" form:"name"`
-	Email   string `json:"email" form:"email"`
-	Address string `json:"address" form:"address"`
-	Phone   string `json:"phone" form:"phone"`
+	Id       int    `json:"id" form:"id"`
+	Username string `json:"username" form:"username"`
+	Email    string `json:"email" form:"email"`
+	Address  string `json:"address" form:"address"`
+	Phone    string `json:"phone" form:"phone"`
 }
 
 func FormatUserResponse(user User) UserResponse {
 	return UserResponse{
-		Id:      user.Id,
-		Name:    user.Name,
-		Email:   user.Email,
-		Address: user.Address,
-		Phone:   user.Phone,
+		Id:       user.Id,
+		Username: user.Username,
+		Email:    user.Email,
+		Address:  user.Address,
+		Phone:    user.Phone,
 	}
 }

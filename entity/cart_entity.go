@@ -8,24 +8,28 @@ type Cart struct {
 	UpdatedAt  time.Time `json:"updated_at" form:"updated_at"`
 	DeletedAt  time.Time `json:"deleted_at" form:"deleted_at"`
 	Product_Id int       `json:"product_id" form:"product_id"`
+	UserId     int       `json:"user_id" form:"user_id"`
 	Qty        int       `json:"qty" form:"qty"`
 	Subtotal   int       `json:"subtotal" form:"subtotal"`
 }
 
 type CreateCartRequest struct {
 	Product_Id int `json:"product_id" form:"product_id"`
+	UserId     int `json:"user_id" form:"user_id"`
 	Qty        int `json:"qty" form:"qty"`
 	Subtotal   int `json:"subtotal" form:"subtotal"`
 }
 
 type EditCartRequest struct {
 	Product_Id int `json:"product_id" form:"product_id"`
+	UserId     int `json:"user_id" form:"user_id"`
 	Qty        int `json:"qty" form:"qty"`
 	Subtotal   int `json:"subtotal" form:"subtotal"`
 }
 
 type CartResponse struct {
 	Product_Id int `json:"product_id" form:"product_id"`
+	UserId     int `json:"user_id" form:"user_id"`
 	Qty        int `json:"qty" form:"qty"`
 	Subtotal   int `json:"subtotal" form:"subtotal"`
 }

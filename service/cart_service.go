@@ -10,6 +10,9 @@ import (
 type CartService interface {
 	CreateCartService(cartCreate entity.CreateCartRequest) (entity.Cart, error)
 	GetAllCartsService() ([]entity.Cart, error)
+	GetCartByIdService(id int) (entity.Cart, error)
+	DeleteCartService(id int) (entity.Cart, error)
+	UpdateCartService(id int, cart entity.EditCartRequest) (entity.Cart, error)
 }
 
 type cartService struct {
@@ -38,4 +41,39 @@ func (s *cartService) GetAllCartsService() ([]entity.Cart, error) {
 		return carts, err
 	}
 	return carts, nil
+}
+
+func (s *cartService) GetCartByIdService(id int) (entity.Cart, error) {
+	cart, err := s.repository.GetCartById(id)
+	if err != nil {
+		return cart, err
+	}
+	return cart, nil
+}
+
+func (s *cartService) DeleteCartService(id int) (entity.Cart, error) {
+	cartID, err := s.GetCartByIdService(id)
+	if err != nil {
+		return cartID, err
+	}
+
+	cartID.DeletedAt = time.Now()
+	deleteCart, err := s.repository.DeleteCart(cartID)
+
+	return deleteCart, err
+}
+
+func (s *cartService) UpdateCartService(id int, cart entity.EditCartRequest) (entity.Cart, error){
+	cartId, err := s.GetCartByIdService(id)
+	if err != nil {
+		return cartId, err
+	}
+	cartId.UpdatedAt = time.Now()
+	cartId.Product_Id = cart.Product_Id
+	cartId.Qty = cart.Qty
+	cartId.Subtotal = cart.Subtotal
+	cartId.UserId = cart.UserId
+
+	updateCart, err := s.repository.UpdateCart(cartId)
+	return	updateCart, err
 }

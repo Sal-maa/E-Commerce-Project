@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/Sal-maa/E-Commerce-Project/entity"
 	"github.com/Sal-maa/E-Commerce-Project/helper"
@@ -19,6 +20,12 @@ func NewCartHandler(cartService service.CartService) *cartHandler {
 }
 
 func (h *cartHandler) CreateCartController(c echo.Context) error {
+	cart := entity.Cart{}
+	userId := c.Get("currentUser").(entity.User)
+	if cart.UserId != userId.Id {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("you dont have permission"))
+	}
+
 	cartCreate := entity.CreateCartRequest{}
 	if err := c.Bind(&cartCreate); err != nil {
 		fmt.Println(err)
@@ -34,6 +41,11 @@ func (h *cartHandler) CreateCartController(c echo.Context) error {
 }
 
 func (h *cartHandler) GetAllCartsController(c echo.Context) error {
+	cart := entity.Cart{}
+	userId := c.Get("currentUser").(entity.User)
+	if cart.UserId != userId.Id {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("you dont have permission"))
+	}
 	carts, err := h.cartService.GetAllCartsService()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, helper.InternalServerError("failed to fetch data"))
@@ -46,4 +58,54 @@ func (h *cartHandler) GetAllCartsController(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, helper.SuccessResponses("success to read data", data))
+}
+
+func (h *cartHandler) DeleteCartController(c echo.Context) error {
+	cart := entity.Cart{}
+	idParam, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed convert id"))
+	}
+
+	userId := c.Get("currentUser").(entity.User)
+	if cart.UserId != userId.Id {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("you dont have permission"))
+	}
+
+	_, err1 := h.cartService.DeleteCartService(idParam)
+
+	if err1 != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed delete data"))
+	}
+
+	return c.JSON(http.StatusOK, helper.SuccessWithoutDataResponses("Success delete data"))
+}
+
+func (h *cartHandler) UpdateCartController(c echo.Context) error{
+	idParam, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed convert id"))
+	}
+	cartUpdate := entity.EditCartRequest{}
+	if err := c.Bind(&cartUpdate); err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to bind data"))
+	}
+
+	userId := c.Get("currentUser").(entity.User)
+	if cartUpdate.UserId != userId.Id {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("you dont have permission"))
+	}
+
+	updatedCart, err := h.cartService.UpdateCartService(idParam, cartUpdate)
+	if err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to update data"))
+	}
+
+	formatRes := entity.FormatCartResponse(updatedCart)
+	return c.JSON(http.StatusOK, helper.SuccessResponses("success update data", formatRes))
+
 }

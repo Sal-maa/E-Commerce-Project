@@ -11,8 +11,10 @@ import (
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
 )
 
-func UserRouter(e *echo.Echo, db *sql.DB) {
-	e.Pre(echoMiddleware.RemoveTrailingSlash(), echoMiddleware.Logger())
+func UserRouter(db *sql.DB) *echo.Echo {
+	e := echo.New()
+	e.Use(echoMiddleware.CORSWithConfig(echoMiddleware.DefaultCORSConfig))
+	// e.Pre(echoMiddleware.RemoveTrailingSlash(), echoMiddleware.Logger())
 	authService := middleware.AuthService()
 	// Route User
 	userRepository := repo.NewUserRepository(db)
@@ -32,7 +34,7 @@ func UserRouter(e *echo.Echo, db *sql.DB) {
 
 	e.POST("/carts", middleware.AuthMiddleware(authService, userService, cartHandler.CreateCartController))
 	e.GET("/carts", middleware.AuthMiddleware(authService, userService, cartHandler.GetAllCartsController))
-	// e.PUT("/carts/:id", middleware.AuthMiddleware(authService, userService, cartHandler.UpdateCartController))
+	e.PUT("/carts/:id", middleware.AuthMiddleware(authService, userService, cartHandler.UpdateCartController))
 	// e.DELETE("/carts/:id", middleware.AuthMiddleware(authService, userService, cartHandler.DeleteCartController))
 
 	// Route product
@@ -45,5 +47,5 @@ func UserRouter(e *echo.Echo, db *sql.DB) {
 	e.POST("/products", middleware.AuthMiddleware(authService, userService, productHandler.CreateProductController))
 	e.PUT("/products/:id", middleware.AuthMiddleware(authService, userService, productHandler.UpdateProductController))
 	e.DELETE("/products/:id", middleware.AuthMiddleware(authService, userService, productHandler.DeleteProductController))
-
+	return e
 }
