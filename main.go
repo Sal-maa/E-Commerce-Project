@@ -25,6 +25,6 @@ func main() {
 	// e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 	e := router.UserRouter(db)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":80"))
 
 }
