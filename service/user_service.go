@@ -37,7 +37,7 @@ func (s *userService) CreateUserService(userCreate entity.CreateUserRequest) (en
 	user := entity.User{}
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
-	user.Name = userCreate.Name
+	user.Username = userCreate.Username
 	user.Email = userCreate.Email
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(userCreate.Password), bcrypt.MinCost)
 	if err != nil {
@@ -60,7 +60,7 @@ func (s *userService) GetUserByNameService(name string) (entity.User, error) {
 }
 
 func (s *userService) LoginUserService(login entity.LoginUserRequest) (entity.User, error) {
-	name := login.Name
+	name := login.Username
 	password := login.Password
 
 	user, err := s.repository.Login(name)
@@ -98,28 +98,28 @@ func (s *userService) DeleteUserService(id int) (entity.User, error) {
 	return deleteUser, err
 }
 
-func (s *userService) UpdateUserService(id int, userUpdate entity.EditUserRequest) (entity.User, error){
+func (s *userService) UpdateUserService(id int, userUpdate entity.EditUserRequest) (entity.User, error) {
 	user, err := s.GetUserByIdService(id)
 	if err != nil {
 		return user, err
 	}
-	
+
 	//user := entity.User{}
 	user.UpdatedAt = time.Now()
 	user.Address = userUpdate.Address
-	user.Name = userUpdate.Name
+	user.Username = userUpdate.Username
 	user.Email = userUpdate.Email
 	user.Phone = userUpdate.Phone
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(userUpdate.Password), bcrypt.MinCost)
-	
+
 	if err != nil {
 		return user, err
 	}
 	user.Password = string(passwordHash)
 
 	updateUser, err := s.repository.UpdateUser(user)
-	
+
 	fmt.Println(user)
-	
-	return updateUser, err 
+
+	return updateUser, err
 }

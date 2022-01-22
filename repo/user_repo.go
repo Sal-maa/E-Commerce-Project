@@ -28,17 +28,16 @@ func NewUserRepository(db *sql.DB) *userRepository {
 
 func (r *userRepository) CheckUser(userChecked entity.CreateUserRequest) (entity.User, error) {
 	user := entity.User{}
-	result, err := r.db.Query("SELECT name FROM users WHERE name=?", userChecked.Name)
+	result, err := r.db.Query("SELECT username FROM users WHERE username=?", userChecked.Username)
 	if err != nil {
 		return user, err
 	}
 	defer result.Close()
-
 	if isExist := result.Next(); isExist {
 		return user, fmt.Errorf("user already exist")
 	}
 
-	if user.Name != userChecked.Name {
+	if user.Username != userChecked.Username {
 		// usernya belum ada
 		return user, nil
 	}
@@ -47,13 +46,15 @@ func (r *userRepository) CheckUser(userChecked entity.CreateUserRequest) (entity
 }
 
 func (r *userRepository) CreateUser(user entity.User) (entity.User, error) {
-	_, err := r.db.Exec("INSERT INTO users(created_at, updated_at, name, email, password, address, phone) VALUES(?,?,?,?,?,?,?)", user.CreatedAt, user.UpdatedAt, user.Name, user.Email, user.Password, user.Address, user.Phone)
+	_, err := r.db.Exec(`INSERT INTO 
+								users(created_at, updated_at, username, email, password, address, phone) 
+						VALUES(?,?,?,?,?,?,?)`, user.CreatedAt, user.UpdatedAt, user.Username, user.Email, user.Password, user.Address, user.Phone)
 	return user, err
 }
 
 func (r *userRepository) GetIdByName(name string) (entity.User, error) {
 	var user entity.User
-	result, err := r.db.Query("SELECT id,name FROM users WHERE name=?", name)
+	result, err := r.db.Query("SELECT id, username FROM users WHERE username=?", name)
 	if err != nil {
 		fmt.Println("failed in query", err)
 	}
@@ -64,12 +65,12 @@ func (r *userRepository) GetIdByName(name string) (entity.User, error) {
 		fmt.Println("data not found", err)
 	}
 
-	errScan := result.Scan(&user.Id, &user.Name)
+	errScan := result.Scan(&user.Id, &user.Username)
 	if errScan != nil {
 		fmt.Println("failed to read data", errScan)
 	}
 
-	if name == user.Name {
+	if name == user.Username {
 		return user, nil
 	}
 	return user, fmt.Errorf("user not found")
@@ -77,7 +78,7 @@ func (r *userRepository) GetIdByName(name string) (entity.User, error) {
 
 func (r *userRepository) Login(name string) (entity.User, error) {
 	user := entity.User{}
-	result, err := r.db.Query("SELECT name,password FROM users WHERE name=? ", name)
+	result, err := r.db.Query("SELECT username,password FROM users WHERE username=? ", name)
 	if err != nil {
 		return user, err
 	}
@@ -87,14 +88,14 @@ func (r *userRepository) Login(name string) (entity.User, error) {
 		return user, fmt.Errorf("user not exist")
 	}
 
-	errScan := result.Scan(&user.Name, &user.Password)
+	errScan := result.Scan(&user.Username, &user.Password)
 
 	if errScan != nil {
 		fmt.Println(errScan)
 		return user, fmt.Errorf("error scanning data")
 	}
 
-	if user.Name == name {
+	if user.Username == name {
 		// usernya benar-benar ada
 		return user, nil
 	}
@@ -109,7 +110,7 @@ func (r *userRepository) SaveToken(token string) (string, error) {
 
 func (r *userRepository) GetUser(idParam int) (entity.User, error) {
 	var user entity.User
-	result, err := r.db.Query("SELECT id, name, email, password, address, phone FROM users WHERE id=?", idParam)
+	result, err := r.db.Query("SELECT id, username, email, password, address, phone FROM users WHERE id=?", idParam)
 	if err != nil {
 		fmt.Println("failed in query", err)
 	}
@@ -120,7 +121,7 @@ func (r *userRepository) GetUser(idParam int) (entity.User, error) {
 		fmt.Println("data not found", err)
 	}
 
-	errScan := result.Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.Address, &user.Phone)
+	errScan := result.Scan(&user.Id, &user.Username, &user.Email, &user.Password, &user.Address, &user.Phone)
 	if errScan != nil {
 		fmt.Println("failed to read data", errScan)
 	}
@@ -137,10 +138,10 @@ func (r *userRepository) DeleteUser(user entity.User) (entity.User, error) {
 }
 
 func (r *userRepository) UpdateUser(user entity.User) (entity.User, error) {
-	_, err := r.db.Exec("UPDATE users SET updated_at = ?, name = ?, email = ?, password = ?, address = ?, phone = ? WHERE id = ?", user.UpdatedAt, user.Name, user.Email, user.Password, user.Address, user.Phone, user.Id)
-	if err != nil{
+	_, err := r.db.Exec(`UPDATE users 
+						SET updated_at = ?, username = ?, email = ?, password = ?, address = ?, phone = ? WHERE id = ?`, user.UpdatedAt, user.Username, user.Email, user.Password, user.Address, user.Phone, user.Id)
+	if err != nil {
 		return user, err
 	}
 	return user, nil
-
 }
