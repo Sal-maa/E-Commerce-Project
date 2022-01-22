@@ -82,7 +82,7 @@ func (h *cartHandler) DeleteCartController(c echo.Context) error {
 	return c.JSON(http.StatusOK, helper.SuccessWithoutDataResponses("Success delete data"))
 }
 
-func (h *cartHandler) UpdateCartController(c echo.Context) error{
+func (h *cartHandler) UpdateCartController(c echo.Context) error {
 	idParam, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
