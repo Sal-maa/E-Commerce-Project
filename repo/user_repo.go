@@ -132,8 +132,13 @@ func (r *userRepository) GetUser(idParam int) (entity.User, error) {
 	return user, fmt.Errorf("user not found")
 }
 
+// func (r *userRepository) DeleteUser(user entity.User) (entity.User, error) {
+// 	_, err := r.db.Exec("UPDATE users SET deleted_at=? WHERE id=?", user.DeletedAt, user.Id)
+// 	return user, err
+// }
+
 func (r *userRepository) DeleteUser(user entity.User) (entity.User, error) {
-	_, err := r.db.Exec("UPDATE users SET deleted_at=? WHERE id=?", user.DeletedAt, user.Id)
+	_, err := r.db.Exec("DELETE FROM products WHERE id =", user.Id)
 	return user, err
 }
 

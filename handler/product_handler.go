@@ -25,6 +25,7 @@ func NewProductHandler(productService service.ProductService) *productHandler {
 func (h *productHandler) GetAllProductsController(c echo.Context) error {
 	products, err := h.productService.GetAllProductsService()
 	if err != nil {
+		fmt.Println(err)
 		return c.JSON(http.StatusInternalServerError, helper.InternalServerError("failed to fetch data"))
 	}
 
@@ -44,10 +45,11 @@ func (h *productHandler) GetProductByIdController(c echo.Context) error {
 	}
 	product, err := h.productService.GetProductByIdService(convId)
 	if err != nil {
+		fmt.Println(err)
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to fetch data"))
 	}
-
-	return c.JSON(http.StatusOK, helper.SuccessResponses("success to read data", product))
+	formatRes := entity.FormatProductResponse(product)
+	return c.JSON(http.StatusOK, helper.SuccessResponses("success to read data", formatRes))
 }
 
 func (h *productHandler) UpdateProductController(c echo.Context) error {
@@ -61,11 +63,10 @@ func (h *productHandler) UpdateProductController(c echo.Context) error {
 		fmt.Println(err)
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to bind data"))
 	}
+	// fmt.Println("product update = ", productUpdate)
 
 	userId := c.Get("currentUser").(entity.User)
-	if productUpdate.UserId != userId.Id {
-		return c.JSON(http.StatusBadRequest, helper.FailedResponses("you dont have permission"))
-	}
+	productUpdate.User = userId
 
 	productUp, err := h.productService.UpdateProductService(idParam, productUpdate)
 	if err != nil {
@@ -78,7 +79,7 @@ func (h *productHandler) UpdateProductController(c echo.Context) error {
 }
 
 func (h *productHandler) DeleteProductController(c echo.Context) error {
-	product := entity.Product{}
+	// product := entity.Product{}
 	idParam, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
@@ -86,11 +87,9 @@ func (h *productHandler) DeleteProductController(c echo.Context) error {
 	}
 
 	userId := c.Get("currentUser").(entity.User)
-	if product.UserId != userId.Id {
-		return c.JSON(http.StatusBadRequest, helper.FailedResponses("you dont have permission"))
-	}
+	currentUser := userId.Id
 
-	_, err1 := h.productService.DeleteProductService(idParam)
+	_, err1 := h.productService.DeleteProductService(idParam, currentUser)
 
 	if err1 != nil {
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed delete data"))
