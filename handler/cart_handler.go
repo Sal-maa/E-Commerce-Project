@@ -20,19 +20,17 @@ func NewCartHandler(cartService service.CartService) *cartHandler {
 }
 
 func (h *cartHandler) CreateCartController(c echo.Context) error {
-	cart := entity.Cart{}
-	userId := c.Get("currentUser").(entity.User)
-	if cart.UserId != userId.Id {
-		return c.JSON(http.StatusBadRequest, helper.FailedResponses("you dont have permission"))
-	}
-
 	cartCreate := entity.CreateCartRequest{}
+	userId := c.Get("currentUser").(entity.User)
+	cartCreate.User = userId
+
 	if err := c.Bind(&cartCreate); err != nil {
 		fmt.Println(err)
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to bind data"))
 	}
 
 	_, err := h.cartService.CreateCartService(cartCreate)
+	// fmt.Println(cartCreate)
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to insert data"))
@@ -41,12 +39,12 @@ func (h *cartHandler) CreateCartController(c echo.Context) error {
 }
 
 func (h *cartHandler) GetAllCartsController(c echo.Context) error {
-	cart := entity.Cart{}
 	userId := c.Get("currentUser").(entity.User)
-	if cart.UserId != userId.Id {
-		return c.JSON(http.StatusBadRequest, helper.FailedResponses("you dont have permission"))
-	}
-	carts, err := h.cartService.GetAllCartsService()
+	// if cart.User.Id != userId.Id {
+	// fmt.Println(cart.User.Id, userId.Id)
+	// 	return c.JSON(http.StatusBadRequest, helper.FailedResponses("you dont have permission"))
+	// }
+	carts, err := h.cartService.GetAllCartsService(userId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, helper.InternalServerError("failed to fetch data"))
 	}
@@ -61,7 +59,6 @@ func (h *cartHandler) GetAllCartsController(c echo.Context) error {
 }
 
 func (h *cartHandler) DeleteCartController(c echo.Context) error {
-	cart := entity.Cart{}
 	idParam, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
@@ -69,11 +66,9 @@ func (h *cartHandler) DeleteCartController(c echo.Context) error {
 	}
 
 	userId := c.Get("currentUser").(entity.User)
-	if cart.UserId != userId.Id {
-		return c.JSON(http.StatusBadRequest, helper.FailedResponses("you dont have permission"))
-	}
+	currentUser := userId.Id
 
-	_, err1 := h.cartService.DeleteCartService(idParam)
+	_, err1 := h.cartService.DeleteCartService(idParam, currentUser)
 
 	if err1 != nil {
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed delete data"))
@@ -88,6 +83,7 @@ func (h *cartHandler) UpdateCartController(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed convert id"))
 	}
+
 	cartUpdate := entity.EditCartRequest{}
 	if err := c.Bind(&cartUpdate); err != nil {
 		fmt.Println(err)
@@ -95,9 +91,7 @@ func (h *cartHandler) UpdateCartController(c echo.Context) error {
 	}
 
 	userId := c.Get("currentUser").(entity.User)
-	if cartUpdate.UserId != userId.Id {
-		return c.JSON(http.StatusBadRequest, helper.FailedResponses("you dont have permission"))
-	}
+	cartUpdate.User = userId
 
 	updatedCart, err := h.cartService.UpdateCartService(idParam, cartUpdate)
 	if err != nil {
@@ -106,6 +100,6 @@ func (h *cartHandler) UpdateCartController(c echo.Context) error {
 	}
 
 	formatRes := entity.FormatCartResponse(updatedCart)
-	return c.JSON(http.StatusOK, helper.SuccessResponses("success update data", formatRes))
+	return c.JSON(http.StatusCreated, helper.SuccessResponses("success update data", formatRes))
 
 }
