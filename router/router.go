@@ -28,7 +28,7 @@ func UserRouter(db *sql.DB) *echo.Echo {
 	e.PUT("/users",middleware.AuthMiddleware(authService, userService, userHandler.UpdateUserLogedInController))
 	//e.PUT("/users/:id", middleware.AuthMiddleware(authService, userService, userHandler.UpdateUserController))
 	e.DELETE("/users", middleware.AuthMiddleware(authService, userService, userHandler.DeleteLogedInUserController))
-	e.DELETE("/users/:id", middleware.AuthMiddleware(authService, userService, userHandler.DeleteUserController))
+	//e.DELETE("/users/:id", middleware.AuthMiddleware(authService, userService, userHandler.DeleteUserController))
 
 	// Route Cart
 	cartRepository := repo.NewCartRepository(db)
@@ -57,6 +57,7 @@ func UserRouter(db *sql.DB) *echo.Echo {
 	orderHandler := handler.NewOrderHandler(orderService)
 
 	e.POST("/orders", middleware.AuthMiddleware(authService, userService, orderHandler.CreateOrderController))
-
+	e.PUT("/orders/:id", middleware.AuthMiddleware(authService, userService, orderHandler.UpdateOrderController))
+	
 	return e
 }

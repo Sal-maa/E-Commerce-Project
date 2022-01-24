@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/Sal-maa/E-Commerce-Project/entity"
 	"github.com/Sal-maa/E-Commerce-Project/helper"
@@ -32,6 +33,28 @@ func (h *orderHandler) CreateOrderController(c echo.Context) error {
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to insert data"))
+	}
+	return c.JSON(http.StatusCreated, helper.SuccessWithoutDataResponses("success insert data"))
+
+}
+
+func (h *orderHandler) UpdateOrderController(c echo.Context) error {
+	updatedOrder := entity.EditOrderRequest{}
+	if err := c.Bind(&updatedOrder); err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to bind data"))
+	}
+
+	idParam, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed convert id"))
+	}
+
+	_, err = h.orderService.UpdateOrderService(idParam, updatedOrder)
+	if err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to update data"))
 	}
 	return c.JSON(http.StatusCreated, helper.SuccessWithoutDataResponses("success insert data"))
 
