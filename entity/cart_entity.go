@@ -21,10 +21,9 @@ type CreateCartRequest struct {
 }
 
 type EditCartRequest struct {
-	ProductId int `json:"product_id"`
-	User      User
-	Qty       int `json:"qty" form:"qty"`
-	Subtotal  int `json:"subtotal" form:"subtotal"`
+	User     User
+	Qty      int `json:"qty" form:"qty"`
+	Subtotal int `json:"subtotal" form:"subtotal"`
 }
 
 type CartResponse struct {
