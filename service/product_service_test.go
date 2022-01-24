@@ -3,6 +3,7 @@ package service_test
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -10,22 +11,27 @@ import (
 
 	"github.com/Sal-maa/E-Commerce-Project/entity"
 	"github.com/Sal-maa/E-Commerce-Project/helper"
+	"github.com/Sal-maa/E-Commerce-Project/repo"
 	"github.com/Sal-maa/E-Commerce-Project/router"
 	"github.com/Sal-maa/E-Commerce-Project/service"
+	"github.com/joho/godotenv"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo/v4"
 )
 
 func InitTestEchoAPIProduct() (*echo.Echo, *sql.DB) {
-	jwtSecret := os.Getenv("JWT_SECRET")
-	connectionString := os.Getenv("DB_CONNECTION_STRING")
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	connectionString := os.Getenv("DB_CONNECTION_TEST")
 	db, err := helper.InitDB(connectionString)
 	if err != nil {
 		panic(err)
 	}
 	e := echo.New()
-	router.UserRouter(e, db, jwtSecret)
+	router.UserRouter(db)
 	return e, db
 }
 
@@ -33,16 +39,18 @@ func TestCreateProduct(t *testing.T) {
 	e, db := InitTestEchoAPIProduct()
 	defer db.Close()
 
-	productRepository := repository.NewProductRepository(db)
+	productRepository := repo.NewProductRepository(db)
 	productService := service.NewProductService(productRepository)
 
 	t.Run("Test Create Success", func(t *testing.T) {
 
-		input := entity.CreateProductRequest{
-			UserId: 3,
-			Name:   "biscuit",
-			Price:  3000,
-			Stock:  19,
+		input := entity.CreateProduct{
+			CategoryId: 3,
+			Name:       "buku apik",
+			Deskripsi:  "buku bacaan",
+			Gambar:     "www.gambar.com",
+			Harga:      9000,
+			Stock:      21,
 		}
 
 		req := httptest.NewRequest(http.MethodPost, "/", nil)
@@ -51,7 +59,7 @@ func TestCreateProduct(t *testing.T) {
 		context := e.NewContext(req, res)
 		context.SetPath("/products")
 
-		result, err := productService.CreateProductService(input)
+		result, err := productService.CreateProductService(1, input)
 		if err != nil {
 			json.Marshal(err)
 		}
@@ -63,7 +71,7 @@ func TestGetProduct(t *testing.T) {
 	// setting controller
 	e, db := InitTestEchoAPIProduct()
 	defer db.Close()
-	productRepository := repository.NewProductRepository(db)
+	productRepository := repo.NewProductRepository(db)
 	productService := service.NewProductService(productRepository)
 
 	t.Run("TestGetAll", func(t *testing.T) {
@@ -72,7 +80,7 @@ func TestGetProduct(t *testing.T) {
 		context := e.NewContext(req, res)
 		context.SetPath("/products")
 
-		result, err := productService.GetProductsService()
+		result, err := productService.GetAllUserProductsService(1)
 		if err != nil {
 			json.Marshal(err)
 		}
@@ -110,11 +118,11 @@ func TestUpdateProduct(t *testing.T) {
 	// setting controller
 	e, db := InitTestEchoAPIProduct()
 	defer db.Close()
-	productRepository := repository.NewProductRepository(db)
+	productRepository := repo.NewProductRepository(db)
 	productService := service.NewProductService(productRepository)
 
 	t.Run("TestUpdateSuccess", func(t *testing.T) {
-		input := entity.EditProductRequest{
+		input := entity.EditProduct{
 			UserId: 3,
 			Name:   "kopi",
 			Price:  10000,

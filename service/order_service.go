@@ -54,7 +54,7 @@ func (s *orderService) CreateOrderService(orderCreate entity.CreateOrderRequest)
 	order.OrderDate = time.Now()
 	order.Total = orderCreate.Total
 	order.Cart = orderCreate.CartId
-	
+
 	createOrder, errOrder = s.repository.CreateOrder(order)
 	// for _, v := range orderCreate.CartId {
 	// 	order.Cart.Id = v
