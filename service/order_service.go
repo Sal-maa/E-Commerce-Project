@@ -50,15 +50,15 @@ func (s *orderService) CreateOrderService(orderCreate entity.CreateOrderRequest)
 	return createOrder3, err3
 }
 
-func (s *orderService) UpdateOrderService(orderId int, editOrder entity.EditOrderRequest) (entity.Order, error) {
+func (s *orderService) UpdateOrderService(id int, updatedOrder entity.EditOrderRequest) (entity.Order, error){
 	order := entity.Order{}
-	order.Id = orderId
+	order.Id = id
 	order.UpdatedAt = time.Now()
-	order.StatusOrder = editOrder.StatusOrder
+	order.StatusOrder = updatedOrder.StatusOrder
 
-	orderUpdate, err := s.repository.UpdateOrder(order)
-	if err != nil{
-		return orderUpdate, err
-	}
-	return orderUpdate, nil	
+	orderUpdated, err := s.repository.UpdateOrder(order)
+	if err != nil {
+		return order, err
+	} 
+	return orderUpdated, nil
 }

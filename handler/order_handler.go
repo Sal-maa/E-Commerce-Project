@@ -57,5 +57,4 @@ func (h *orderHandler) UpdateOrderController(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to update data"))
 	}
 	return c.JSON(http.StatusCreated, helper.SuccessWithoutDataResponses("success insert data"))
-
 }
