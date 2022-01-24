@@ -138,7 +138,7 @@ func (r *userRepository) GetUser(idParam int) (entity.User, error) {
 // }
 
 func (r *userRepository) DeleteUser(user entity.User) (entity.User, error) {
-	_, err := r.db.Exec("DELETE FROM products WHERE id =", user.Id)
+	_, err := r.db.Exec("DELETE FROM users WHERE id = ?", user.Id)
 	return user, err
 }
 

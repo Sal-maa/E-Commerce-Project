@@ -38,6 +38,25 @@ func (h *productHandler) GetAllProductsController(c echo.Context) error {
 	return c.JSON(http.StatusOK, helper.SuccessResponses("success to read data", data))
 }
 
+func (h *productHandler) GetUserProductsController(c echo.Context) error {
+	userId := c.Get("currentUser").(entity.User)
+	currentUser := userId.Id
+	
+	products, err := h.productService.GetAllUserProductsService(currentUser)
+	if err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusInternalServerError, helper.InternalServerError("failed to fetch data"))
+	}
+
+	data := []entity.ProductResponse{}
+	for i := 0; i < len(products); i++ {
+		formatRes := entity.FormatProductResponse(products[i])
+		data = append(data, formatRes)
+	}
+
+	return c.JSON(http.StatusOK, helper.SuccessResponses("success to read data", data))
+}
+
 func (h *productHandler) GetProductByIdController(c echo.Context) error {
 	convId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
