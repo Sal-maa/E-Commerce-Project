@@ -88,6 +88,18 @@ func (h *userHandler) GetUserController(c echo.Context) error {
 	return c.JSON(http.StatusOK, helper.SuccessResponses("success to read data", formatRes))
 }
 
+func (h *userHandler) GetUserLogedInController(c echo.Context) error {
+	userId := c.Get("currentUser").(entity.User)
+	currentUser := userId.Id 
+	user, err := h.userService.GetUserByIdService(currentUser)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.InternalServerError("failed to fetch data"))
+	}
+
+	formatRes := entity.FormatUserResponse(user)
+	return c.JSON(http.StatusOK, helper.SuccessResponses("success to read data", formatRes))
+}
+
 func (h *userHandler) DeleteUserController(c echo.Context) error {
 	idParam, err := strconv.Atoi(c.Param("id"))
 
