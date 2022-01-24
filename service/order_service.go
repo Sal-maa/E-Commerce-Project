@@ -22,29 +22,44 @@ func NewOrderService(repository repo.OrderRepository) *orderService {
 func (s *orderService) CreateOrderService(orderCreate entity.CreateOrderRequest) (entity.Order, error) {
 	order := entity.Order{}
 
-	order.CreatedAt = time.Now()
-	order.UpdatedAt = time.Now()
-	order.Cart.Id = orderCreate.CartId
-	order.StatusOrder = "Processed"
-	order.OrderDate = time.Now()
-	order.Total = orderCreate.Total
-	createOrder1, err1 := s.repository.CreateOrder1(order)
-	if err1 != nil {
-		return createOrder1, err1
-	}
 	order.Address.Street = orderCreate.Address.Street
 	order.Address.City = orderCreate.Address.City
 	order.Address.State = orderCreate.Address.State
 	order.Address.Zip = orderCreate.Address.Zip
-	createOrder2, err2 := s.repository.CreateOrder2(order)
-	if err2 != nil {
-		return createOrder2, err2
+	createAddress, errAddress := s.repository.CreateAddress(order)
+	if errAddress != nil {
+		return order, errAddress
 	}
+
 	order.CreditCard.Type = orderCreate.CreditCard.Type
 	order.CreditCard.Name = orderCreate.CreditCard.Name
 	order.CreditCard.Number = orderCreate.CreditCard.Number
 	order.CreditCard.CVV = orderCreate.CreditCard.CVV
-	createOrder3, err3 := s.repository.CreateOrder3(order)
 
-	return createOrder3, err3
+	createPayment, errPayment := s.repository.CreatePayment(order)
+	if errPayment != nil {
+		return order, errPayment
+	}
+
+	var createOrder entity.Order
+	var errOrder error
+
+	order.CreatedAt = time.Now()
+	order.UpdatedAt = time.Now()
+	order.User = orderCreate.User
+	order.Address.Id = createAddress.Id
+	order.CreditCard.Id = createPayment.Id
+	order.StatusOrder = "Processed"
+	order.OrderDate = time.Now()
+	order.Total = orderCreate.Total
+
+	for _, v := range orderCreate.CartId {
+		order.Cart.Id = v
+		createOrder, errOrder := s.repository.CreateOrder(order)
+		if errOrder != nil {
+			return createOrder, errOrder
+		}
+	}
+
+	return createOrder, errOrder
 }

@@ -20,6 +20,7 @@ func NewOrderHandler(orderService service.OrderService) *orderHandler {
 
 func (h *orderHandler) CreateOrderController(c echo.Context) error {
 	orderCreate := entity.CreateOrderRequest{}
+
 	userId := c.Get("currentUser").(entity.User)
 	orderCreate.User = userId
 

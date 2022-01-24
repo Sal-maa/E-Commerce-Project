@@ -14,7 +14,6 @@ import (
 )
 
 type productHandler struct {
-	//authService middleware.JWTService
 	productService service.ProductService
 }
 
@@ -41,7 +40,7 @@ func (h *productHandler) GetAllProductsController(c echo.Context) error {
 func (h *productHandler) GetUserProductsController(c echo.Context) error {
 	userId := c.Get("currentUser").(entity.User)
 	currentUser := userId.Id
-	
+
 	products, err := h.productService.GetAllUserProductsService(currentUser)
 	if err != nil {
 		fmt.Println(err)
