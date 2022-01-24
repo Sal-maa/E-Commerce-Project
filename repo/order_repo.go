@@ -12,6 +12,7 @@ type OrderRepository interface {
 	CreatePayment(order entity.Order) (entity.CreditCard, error)
 	CreateOrder(order entity.Order) (entity.Order, error)
 	GetId() (int, error)
+	UpdateOrder(order entity.Order) (entity.Order, error)
 }
 
 type orderRepository struct {
@@ -94,4 +95,12 @@ func (r *orderRepository) GetId() (int, error) {
 		fmt.Println("failed to read data", errScan)
 	}
 	return id, err
+}
+
+func (r *orderRepository) UpdateOrder(order entity.Order) (entity.Order, error) {
+	_, err := r.db.Exec("UPDATE orders SET updated_at = ?, status_order = ? WHERE id = ?", order.UpdatedAt, order.StatusOrder, order.Id)
+	if err != nil {
+		fmt.Println("update error:", err)
+	}
+	return order, err
 }

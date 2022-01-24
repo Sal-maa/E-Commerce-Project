@@ -57,6 +57,7 @@ func UserRouter(db *sql.DB) *echo.Echo {
 	orderHandler := handler.NewOrderHandler(orderService)
 
 	e.POST("/orders", middleware.AuthMiddleware(authService, userService, orderHandler.CreateOrderController))
+	e.PUT("/orders", middleware.AuthMiddleware(authService, userService, orderHandler.UpdateOrderController) )
 
 	return e
 }
