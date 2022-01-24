@@ -30,7 +30,7 @@ type Order struct {
 	UpdatedAt   time.Time `json:"updated_at" form:"updated_at"`
 	DeletedAt   time.Time `json:"deleted_at" form:"deleted_at"`
 	User        User      `json:"user"`
-	Cart        Cart
+	Cart        []int
 	Address     Address    `json:"address"`
 	CreditCard  CreditCard `json:"credit_card"`
 	StatusOrder string     `json:"status_order"`

@@ -53,14 +53,16 @@ func (s *orderService) CreateOrderService(orderCreate entity.CreateOrderRequest)
 	order.StatusOrder = "Processed"
 	order.OrderDate = time.Now()
 	order.Total = orderCreate.Total
-
-	for _, v := range orderCreate.CartId {
-		order.Cart.Id = v
-		createOrder, errOrder := s.repository.CreateOrder(order)
-		if errOrder != nil {
-			return createOrder, errOrder
-		}
-	}
+	order.Cart = orderCreate.CartId
+	
+	createOrder, errOrder = s.repository.CreateOrder(order)
+	// for _, v := range orderCreate.CartId {
+	// 	order.Cart.Id = v
+	// 	createOrder, errOrder := s.repository.CreateOrder(order)
+	// 	if errOrder != nil {
+	// 		return createOrder, errOrder
+	// 	}
+	// }
 
 	return createOrder, errOrder
 }

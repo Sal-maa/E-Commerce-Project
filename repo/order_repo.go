@@ -2,6 +2,7 @@ package repo
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 
 	"github.com/Sal-maa/E-Commerce-Project/entity"
@@ -72,9 +73,11 @@ func (r *orderRepository) CreatePayment(order entity.Order) (entity.CreditCard, 
 }
 
 func (r *orderRepository) CreateOrder(order entity.Order) (entity.Order, error) {
+	cartByte, _ := json.Marshal([]int(order.Cart))
+	cartString := string(cartByte)
 	_, err := r.db.Exec(`INSERT INTO orders(created_at, updated_at, user_id, address_id, creditcard_id, cart_id, status_order, order_date, total)
 						VALUES(?,?,?,?,?,?,?,?,?);
-						`, order.CreatedAt, order.UpdatedAt, order.User.Id, order.Address.Id, order.CreditCard.Id, order.Cart.Id, order.StatusOrder, order.OrderDate, order.Total)
+						`, order.CreatedAt, order.UpdatedAt, order.User.Id, order.Address.Id, order.CreditCard.Id, cartString, order.StatusOrder, order.OrderDate, order.Total)
 	return order, err
 }
 
