@@ -47,5 +47,8 @@ func UserRouter(db *sql.DB) *echo.Echo {
 	e.POST("/products", middleware.AuthMiddleware(authService, userService, productHandler.CreateProductController))
 	e.PUT("/products/:id", middleware.AuthMiddleware(authService, userService, productHandler.UpdateProductController))
 	e.DELETE("/products/:id", middleware.AuthMiddleware(authService, userService, productHandler.DeleteProductController))
+	
+	e.GET("/user-products", middleware.AuthMiddleware(authService, userService, productHandler.GetUserProductsController))
+
 	return e
 }
