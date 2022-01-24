@@ -79,7 +79,6 @@ func (h *productHandler) UpdateProductController(c echo.Context) error {
 }
 
 func (h *productHandler) DeleteProductController(c echo.Context) error {
-	// product := entity.Product{}
 	idParam, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
