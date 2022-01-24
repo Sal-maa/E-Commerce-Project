@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	_ "fmt"
 	"time"
 
@@ -43,9 +44,6 @@ func (s *orderService) CreateOrderService(orderCreate entity.CreateOrderRequest)
 		return order, errPayment
 	}
 
-	// var createOrder entity.Order
-	// var errOrder error
-
 	order.CreatedAt = time.Now()
 	order.UpdatedAt = time.Now()
 	order.User = orderCreate.User
@@ -56,20 +54,11 @@ func (s *orderService) CreateOrderService(orderCreate entity.CreateOrderRequest)
 	order.Total = orderCreate.Total
 	order.Cart = orderCreate.CartId
 
-	// createOrder, errOrder = s.repository.CreateOrder(order)
-	// for _, v := range orderCreate.CartId {
-	// 	order.Cart.Id = v
-	// 	createOrder, errOrder := s.repository.CreateOrder(order)
-	// 	if errOrder != nil {
-	// 		return createOrder, errOrder
-	// 	}
-	// }
-
 	createOrder, errOrder := s.repository.CreateOrder(order)
 	if errOrder != nil {
 		return order, errOrder
 	}
-
+	fmt.Println(createOrder)
 	orderDetail := entity.CreateOrderDetailRequest{}
 	orderDetail.OrderId = createOrder
 	for _, v := range orderCreate.CartId {

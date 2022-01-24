@@ -20,7 +20,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func InitTestEchoAPIProduct() (*echo.Echo, *sql.DB) {
+func InitTestEchoAPICart() (*echo.Echo, *sql.DB) {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -35,31 +35,28 @@ func InitTestEchoAPIProduct() (*echo.Echo, *sql.DB) {
 	return e, db
 }
 
-func TestCreateProduct(t *testing.T) {
-	e, db := InitTestEchoAPIProduct()
+func TestCreateCart(t *testing.T) {
+	e, db := InitTestEchoAPICart()
 	defer db.Close()
 
-	productRepository := repo.NewProductRepository(db)
-	productService := service.NewProductService(productRepository)
+	cartRepository := repo.NewCartRepository(db)
+	cartService := service.NewCartService(cartRepository)
 
 	t.Run("Test Create Success", func(t *testing.T) {
 
-		input := entity.CreateProduct{
-			CategoryId: 3,
-			Name:       "buku apik",
-			Deskripsi:  "buku bacaan",
-			Gambar:     "www.gambar.com",
-			Harga:      9000,
-			Stock:      21,
+		input := entity.CreateCartRequest{
+			ProductId: 1,
+			Qty:       2,
+			Subtotal:  90000,
 		}
 
 		req := httptest.NewRequest(http.MethodPost, "/", nil)
 		res := httptest.NewRecorder()
 		req.Header.Set("Content-Type", "application/json")
 		context := e.NewContext(req, res)
-		context.SetPath("/products")
+		context.SetPath("/carts")
 
-		result, err := productService.CreateProductService(1, input)
+		result, err := cartService.CreateCartService(input)
 		if err != nil {
 			json.Marshal(err)
 		}
@@ -67,20 +64,28 @@ func TestCreateProduct(t *testing.T) {
 	})
 }
 
-func TestGetProduct(t *testing.T) {
+func TestGetCart(t *testing.T) {
 	// setting controller
-	e, db := InitTestEchoAPIProduct()
+	e, db := InitTestEchoAPICart()
 	defer db.Close()
-	productRepository := repo.NewProductRepository(db)
-	productService := service.NewProductService(productRepository)
+	cartRepository := repo.NewCartRepository(db)
+	cartService := service.NewCartService(cartRepository)
+
+	user := entity.User{
+		Username: "sintia",
+		Email:    "halo",
+		Password: "12mks",
+		Address:  "disana",
+		Phone:    "kskxnsa",
+	}
 
 	t.Run("TestGetAll", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/products")
+		context.SetPath("/carts")
 
-		result, err := productService.GetAllUserProductsService(1)
+		result, err := cartService.GetAllCartsService(user)
 		if err != nil {
 			json.Marshal(err)
 		}
@@ -90,10 +95,10 @@ func TestGetProduct(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/products/:id")
+		context.SetPath("/carts/:id")
 		context.SetParamNames("id")
 
-		result, err := productService.GetProductByIdService(7)
+		result, err := cartService.GetCartByIdService(1)
 		if err != nil {
 			json.Marshal(err)
 		}
@@ -103,10 +108,10 @@ func TestGetProduct(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/products/:id")
+		context.SetPath("/carts/:id")
 		context.SetParamNames("id")
 
-		result, err := productService.GetProductByIdService(1)
+		result, err := cartService.GetCartByIdService(100)
 		if err != nil {
 			json.Marshal(err)
 		}
@@ -114,50 +119,42 @@ func TestGetProduct(t *testing.T) {
 	})
 }
 
-func TestUpdateProduct(t *testing.T) {
+func TestUpdateCart(t *testing.T) {
 	// setting controller
-	e, db := InitTestEchoAPIProduct()
+	e, db := InitTestEchoAPICart()
 	defer db.Close()
-	productRepository := repo.NewProductRepository(db)
-	productService := service.NewProductService(productRepository)
+	cartRepository := repo.NewCartRepository(db)
+	cartService := service.NewCartService(cartRepository)
 
 	t.Run("TestUpdateSuccess", func(t *testing.T) {
-		input := entity.EditProduct{
-			CategoryId: 3,
-			Name:       "buku apik",
-			Deskripsi:  "buku bacaan",
-			Gambar:     "www.gambar.com",
-			Harga:      19000,
-			Stock:      21,
+		input := entity.EditCartRequest{
+			Qty:      21,
+			Subtotal: 800000,
 		}
 		req := httptest.NewRequest(http.MethodPut, "/", nil)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/products/:id")
+		context.SetPath("/carts/:id")
 		context.SetParamNames("id")
 
-		result, err := productService.UpdateProductService(8, input)
+		result, err := cartService.UpdateCartService(8, input)
 		if err != nil {
 			json.Marshal(err)
 		}
 		json.Marshal(result)
 	})
 	t.Run("TestUpdateError", func(t *testing.T) {
-		input := entity.EditProduct{
-			CategoryId: 3,
-			Name:       "buku apik",
-			Deskripsi:  "buku bacaan",
-			Gambar:     "www.gambar.com",
-			Harga:      9000,
-			Stock:      21,
+		input := entity.EditCartRequest{
+			Qty:      21,
+			Subtotal: 800000,
 		}
 		req := httptest.NewRequest(http.MethodPut, "/", nil)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/products/:id")
+		context.SetPath("/carts/:id")
 		context.SetParamNames("id")
 
-		result, err := productService.UpdateProductService(6, input)
+		result, err := cartService.UpdateCartService(600, input)
 		if err != nil {
 			json.Marshal(err)
 		}
@@ -165,22 +162,22 @@ func TestUpdateProduct(t *testing.T) {
 	})
 }
 
-func TestDeleteProduct(t *testing.T) {
+func TestDeleteCart(t *testing.T) {
 	// setting controller
-	e, db := InitTestEchoAPIProduct()
+	e, db := InitTestEchoAPICart()
 	defer db.Close()
 
-	productRepository := repo.NewProductRepository(db)
-	productService := service.NewProductService(productRepository)
+	cartRepository := repo.NewCartRepository(db)
+	cartService := service.NewCartService(cartRepository)
 
 	t.Run("TestDeleteSuccess", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodDelete, "/", nil)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/products/:id")
+		context.SetPath("/carts/:id")
 		context.SetParamNames("id")
 
-		result, err := productService.DeleteProductService(1, 2)
+		result, err := cartService.DeleteCartService(1, 2)
 		if err != nil {
 			json.Marshal(err)
 		}
@@ -190,10 +187,10 @@ func TestDeleteProduct(t *testing.T) {
 		req := httptest.NewRequest(http.MethodDelete, "/", nil)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/products/:id")
+		context.SetPath("/carts/:id")
 		context.SetParamNames("id")
 
-		result, err := productService.DeleteProductService(99, 100)
+		result, err := cartService.DeleteCartService(99, 100)
 		if err != nil {
 			json.Marshal(err)
 		}
