@@ -10,6 +10,7 @@ import (
 type ProductRepository interface {
 	GetAllProducts() ([]entity.Product, error)
 	GetProductById(id int) (entity.Product, error)
+	GetAllUserProducts(userId int) ([]entity.Product, error)
 	CreateProduct(userId int, product entity.Product) (entity.Product, error)
 	UpdateProduct(product entity.Product) (entity.Product, error)
 	DeleteProduct(product entity.Product) (entity.Product, error)
@@ -91,4 +92,27 @@ func (r *productRepository) CreateProduct(userId int, product entity.Product) (e
 						VALUE(?,?,?,?,?,?,?,?,?)`, product.CreatedAt, product.UpdatedAt, product.Name, product.Deskripsi, product.Gambar, product.Harga, product.Stock, product.CategoryId, userId)
 
 	return product, err
+}
+
+func (r *productRepository) GetAllUserProducts(userId int) ([]entity.Product, error) {
+	products := []entity.Product{}
+
+	result, err := r.db.Query("SELECT p.id, p.name, p.deskripsi, p.gambar, p.harga, p.stock, p.category_id, p.user_id, u.username FROM products p JOIN users u ON p.user_id=u.id WHERE p.user_id = ?", userId)
+	if err != nil {
+		fmt.Println(err)
+		return products, fmt.Errorf("failed in query")
+	}
+
+	defer result.Close()
+
+	for result.Next() {
+		product := entity.Product{}
+		err := result.Scan(&product.Id, &product.Name, &product.Deskripsi, &product.Gambar, &product.Harga, &product.Stock, &product.CategoryId, &product.User.Id, &product.User.Username)
+		if err != nil {
+			fmt.Println(err)
+			return products, fmt.Errorf("failed to scan")
+		}
+		products = append(products, product)
+	}
+	return products, err
 }

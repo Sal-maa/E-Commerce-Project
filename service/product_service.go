@@ -13,6 +13,7 @@ import (
 
 type ProductService interface {
 	GetAllProductsService() ([]entity.Product, error)
+	GetAllUserProductsService(userId int) ([]entity.Product, error)
 	GetProductByIdService(id int) (entity.Product, error)
 	CreateProductService(userId int, product entity.CreateProduct) (entity.Product, error)
 	UpdateProductService(id int, productUpdate entity.EditProduct) (entity.Product, error)
@@ -29,6 +30,14 @@ func NewProductService(repository repo.ProductRepository) *productService {
 
 func (s *productService) GetAllProductsService() ([]entity.Product, error) {
 	products, err := s.repository.GetAllProducts()
+	if err != nil {
+		return products, err
+	}
+	return products, nil
+}
+
+func (s *productService) GetAllUserProductsService(userId int) ([]entity.Product, error) {
+	products, err := s.repository.GetAllUserProducts(userId)
 	if err != nil {
 		return products, err
 	}
