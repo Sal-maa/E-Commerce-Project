@@ -47,6 +47,11 @@ type CreateOrderRequest struct {
 	Total      int        `json:"total"`
 }
 
+type CreateOrderDetailRequest struct {
+	CartId  int `json:"cart_id" form:"cart_id"`
+	OrderId int `json:"order_id" form:"order_id"`
+}
+
 type EditOrderRequest struct {
 	StatusOrder string `json:"status_order"`
 }
