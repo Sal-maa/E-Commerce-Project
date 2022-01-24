@@ -80,7 +80,6 @@ func (s *cartService) UpdateCartService(id int, cartUpdate entity.EditCartReques
 		return cartId, fmt.Errorf("you dont have permission")
 	}
 	cartId.UpdatedAt = time.Now()
-	cartId.Product.Id = cartUpdate.ProductId
 	cartId.Qty = cartUpdate.Qty
 	cartId.Subtotal = cartUpdate.Subtotal
 
