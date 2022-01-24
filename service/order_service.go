@@ -9,6 +9,7 @@ import (
 
 type OrderService interface {
 	CreateOrderService(orderCreate entity.CreateOrderRequest) (entity.Order, error)
+	UpdateOrderService(id int, updatedOrder entity.EditOrderRequest) (entity.Order, error)
 }
 
 type orderService struct {
@@ -47,4 +48,17 @@ func (s *orderService) CreateOrderService(orderCreate entity.CreateOrderRequest)
 	createOrder3, err3 := s.repository.CreateOrder3(order)
 
 	return createOrder3, err3
+}
+
+func (s *orderService) UpdateOrderService(id int, updatedOrder entity.EditOrderRequest) (entity.Order, error){
+	order := entity.Order{}
+	order.Id = id
+	order.UpdatedAt = time.Now()
+	order.StatusOrder = updatedOrder.StatusOrder
+
+	orderUpdated, err := s.repository.UpdateOrder(order)
+	if err != nil {
+		return order, err
+	} 
+	return orderUpdated, nil
 }
