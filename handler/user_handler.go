@@ -116,6 +116,25 @@ func (h *userHandler) DeleteUserController(c echo.Context) error {
 	return c.JSON(http.StatusOK, helper.SuccessResponses("Success delete data", formatRes))
 }
 
+func (h *userHandler) UpdateUserLogedInController(c echo.Context) error{
+	userId := c.Get("currentUser").(entity.User)
+	currentUser := userId.Id 
+
+	userUpdate := entity.EditUserRequest{}
+	if err := c.Bind(&userUpdate); err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to bind data"))
+	}
+
+	_, err := h.userService.UpdateUserService(currentUser, userUpdate)
+	if err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to update data"))
+	}
+	return c.JSON(http.StatusCreated, helper.SuccessWithoutDataResponses("success update data"))
+
+}
+
 func (h *userHandler) UpdateUserController(c echo.Context) error {
 	userUpdate := entity.EditUserRequest{}
 	if err := c.Bind(&userUpdate); err != nil {
