@@ -11,7 +11,8 @@ import (
 type OrderRepository interface {
 	CreateAddress(order entity.Order) (entity.Address, error)
 	CreatePayment(order entity.Order) (entity.CreditCard, error)
-	CreateOrder(order entity.Order) (entity.Order, error)
+	CreateOrder(order entity.Order) (int, error)
+	CreateOrderDetail(orderDetail entity.CreateOrderDetailRequest) (entity.CreateOrderDetailRequest, error)
 	GetId() (int, error)
 	UpdateOrder(order entity.Order) (entity.Order, error)
 }
@@ -72,13 +73,39 @@ func (r *orderRepository) CreatePayment(order entity.Order) (entity.CreditCard, 
 	return payment, err
 }
 
-func (r *orderRepository) CreateOrder(order entity.Order) (entity.Order, error) {
+func (r *orderRepository) CreateOrder(order entity.Order) (int, error) {
 	cartByte, _ := json.Marshal([]int(order.Cart))
 	cartString := string(cartByte)
 	_, err := r.db.Exec(`INSERT INTO orders(created_at, updated_at, user_id, address_id, creditcard_id, cart_id, status_order, order_date, total)
 						VALUES(?,?,?,?,?,?,?,?,?);
 						`, order.CreatedAt, order.UpdatedAt, order.User.Id, order.Address.Id, order.CreditCard.Id, cartString, order.StatusOrder, order.OrderDate, order.Total)
-	return order, err
+	
+	result, errId := r.db.Query(`SELECT id FROM orders WHERE created_at = ? AND updated_at = ?  AND user_id = ? 
+								AND address_id = ? AND creditcard_id = ? AND cart_id = ? AND status_order = ? AND order_date = ? AND total = ? ORDER BY id DESC LIMIT 1`,
+								order.CreatedAt, order.UpdatedAt, order.User.Id, order.Address.Id, order.CreditCard.Id, cartString, order.StatusOrder, order.OrderDate, order.Total)
+	if errId != nil {
+		fmt.Println("failed in query", errId)
+	}
+
+	defer result.Close()
+
+	if isExist := result.Next(); !isExist {
+		fmt.Println("data not found", err)
+	}
+	var orderId int
+	errScan := result.Scan(&orderId)
+	if errScan != nil {
+		fmt.Println("failed to read data", errScan)
+	}
+	return orderId, err
+}
+
+func (r *orderRepository) CreateOrderDetail(orderDetail entity.CreateOrderDetailRequest) (entity.CreateOrderDetailRequest, error){
+	_, err := r.db.Exec(`INSERT INTO order_details(order_id, cart_id) VALUES(?,?)`, orderDetail.OrderId, orderDetail.CartId)
+	if err != nil {
+		return orderDetail, err
+	}
+	return orderDetail, nil
 }
 
 func (r *orderRepository) GetId() (int, error) {

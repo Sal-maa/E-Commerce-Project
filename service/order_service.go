@@ -1,6 +1,7 @@
 package service
 
 import (
+	_"fmt"
 	"time"
 
 	"github.com/Sal-maa/E-Commerce-Project/entity"
@@ -42,8 +43,8 @@ func (s *orderService) CreateOrderService(orderCreate entity.CreateOrderRequest)
 		return order, errPayment
 	}
 
-	var createOrder entity.Order
-	var errOrder error
+	// var createOrder entity.Order
+	// var errOrder error
 
 	order.CreatedAt = time.Now()
 	order.UpdatedAt = time.Now()
@@ -54,17 +55,22 @@ func (s *orderService) CreateOrderService(orderCreate entity.CreateOrderRequest)
 	order.OrderDate = time.Now()
 	order.Total = orderCreate.Total
 	order.Cart = orderCreate.CartId
-	
-	createOrder, errOrder = s.repository.CreateOrder(order)
-	// for _, v := range orderCreate.CartId {
-	// 	order.Cart.Id = v
-	// 	createOrder, errOrder := s.repository.CreateOrder(order)
-	// 	if errOrder != nil {
-	// 		return createOrder, errOrder
-	// 	}
-	// }
 
-	return createOrder, errOrder
+	createOrder, errOrder := s.repository.CreateOrder(order)
+	if errOrder != nil {
+		return order, errOrder
+	}
+
+	orderDetail := entity.CreateOrderDetailRequest{}
+	orderDetail.OrderId = createOrder
+	for _, v := range orderCreate.CartId {
+	 	orderDetail.CartId = v
+		_, errOrder := s.repository.CreateOrderDetail(orderDetail)
+		if errOrder != nil {
+			return order, errOrder
+		}
+	}
+	return order, errOrder
 }
 
 func (s *orderService) UpdateOrderService(id int, updatedOrder entity.EditOrderRequest) (entity.Order, error) {
