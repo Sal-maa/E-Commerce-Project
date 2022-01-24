@@ -100,6 +100,19 @@ func (h *userHandler) GetUserLogedInController(c echo.Context) error {
 	return c.JSON(http.StatusOK, helper.SuccessResponses("success to read data", formatRes))
 }
 
+func (h *userHandler) DeleteLogedInUserController(c echo.Context) error {
+	userId := c.Get("currentUser").(entity.User)
+	currentUser := userId.Id 
+	
+	user, err1 := h.userService.DeleteUserService(currentUser)
+	if err1 != nil {
+		fmt.Println(err1)
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed delete data"))
+	}
+	formatRes := entity.FormatUserResponse(user)
+	return c.JSON(http.StatusOK, helper.SuccessResponses("Success delete data", formatRes))
+}
+
 func (h *userHandler) DeleteUserController(c echo.Context) error {
 	idParam, err := strconv.Atoi(c.Param("id"))
 
