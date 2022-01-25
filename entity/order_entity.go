@@ -57,6 +57,7 @@ type EditOrderRequest struct {
 }
 
 type OrderResponse struct {
+	Id			int				  `json:"id"`
 	User        UserOrderResponse `json:"user"`
 	Cart        []int 			  `json:"cart"`
 	Address     Address           `json:"address"`
@@ -67,6 +68,7 @@ type OrderResponse struct {
 
 func FormatOrderResponse(order Order) OrderResponse {
 	return OrderResponse{
+		Id:	order.Id,
 		User: UserOrderResponse{
 			Id:       order.User.Id,
 			Username: order.User.Username,
