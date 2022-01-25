@@ -30,26 +30,17 @@ func NewProductService(repository repo.ProductRepository) *productService {
 
 func (s *productService) GetAllProductsService() ([]entity.Product, error) {
 	products, err := s.repository.GetAllProducts()
-	if err != nil {
-		return products, err
-	}
-	return products, nil
+	return products, err
 }
 
 func (s *productService) GetAllUserProductsService(userId int) ([]entity.Product, error) {
 	products, err := s.repository.GetAllUserProducts(userId)
-	if err != nil {
-		return products, err
-	}
-	return products, nil
+	return products, err
 }
 
 func (s *productService) GetProductByIdService(id int) (entity.Product, error) {
 	product, err := s.repository.GetProductById(id)
-	if err != nil {
-		return product, err
-	}
-	return product, nil
+	return product, err
 }
 
 func (s *productService) UpdateProductService(id int, productUpdate entity.EditProduct) (entity.Product, error) {
@@ -60,8 +51,6 @@ func (s *productService) UpdateProductService(id int, productUpdate entity.EditP
 	}
 
 	if productUpdate.User.Id != product.User.Id {
-		fmt.Println("productUpdate.User.Id", productUpdate.User.Id)
-		fmt.Println("userId.Id", product.User.Id)
 		return product, fmt.Errorf("you dont have permission")
 	}
 

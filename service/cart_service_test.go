@@ -137,7 +137,7 @@ func TestUpdateCart(t *testing.T) {
 		context.SetPath("/carts/:id")
 		context.SetParamNames("id")
 
-		result, err := cartService.UpdateCartService(8, input)
+		result, err := cartService.UpdateCartService(3, input)
 		if err != nil {
 			json.Marshal(err)
 		}
