@@ -1,7 +1,8 @@
 package service
 
 import (
-	_"fmt"
+	"fmt"
+	_ "fmt"
 	"time"
 
 	"github.com/Sal-maa/E-Commerce-Project/entity"
@@ -44,9 +45,6 @@ func (s *orderService) CreateOrderService(orderCreate entity.CreateOrderRequest)
 		return order, errPayment
 	}
 
-	// var createOrder entity.Order
-	// var errOrder error
-
 	order.CreatedAt = time.Now()
 	order.UpdatedAt = time.Now()
 	order.User = orderCreate.User
@@ -61,11 +59,11 @@ func (s *orderService) CreateOrderService(orderCreate entity.CreateOrderRequest)
 	if errOrder != nil {
 		return order, errOrder
 	}
-
+	fmt.Println(createOrder)
 	orderDetail := entity.CreateOrderDetailRequest{}
 	orderDetail.OrderId = createOrder
 	for _, v := range orderCreate.CartId {
-	 	orderDetail.CartId = v
+		orderDetail.CartId = v
 		_, errOrder := s.repository.CreateOrderDetail(orderDetail)
 		if errOrder != nil {
 			return order, errOrder
