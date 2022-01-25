@@ -13,6 +13,7 @@ type OrderService interface {
 	CreateOrderService(orderCreate entity.CreateOrderRequest) (entity.Order, error)
 	UpdateOrderService(id int, updatedOrder entity.EditOrderRequest) (entity.Order, error)
 	GetOrderService(id int) ([]entity.Order, error)
+	GetOrderByIdService(userId, orderId int) (entity.Order, error)
 }
 
 type orderService struct {
@@ -91,4 +92,12 @@ func (s *orderService) GetOrderService(id int) ([]entity.Order, error){
 		return orders, err
 	}
 	return orders, nil
+}
+
+func (s *orderService) GetOrderByIdService(userId, orderId int) (entity.Order, error){
+	order, err := s.repository.GetOrderById(userId, orderId)
+	if err != nil {
+		return order, err
+	}
+	return order, nil
 }

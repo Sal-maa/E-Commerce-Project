@@ -60,6 +60,22 @@ func (h *orderHandler) UpdateOrderController(c echo.Context) error {
 	return c.JSON(http.StatusCreated, helper.SuccessWithoutDataResponses("success insert data"))
 }
 
+func (h *orderHandler) GetOrderByIdController(c echo.Context) error{
+	userId := c.Get("currentUser").(entity.User)
+	orderId, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed convert id"))
+	}
+
+	order, err := h.orderService.GetOrderByIdService(userId.Id, orderId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.InternalServerError("failed to fetch data"))
+	}
+	formatRes := entity.FormatOrderResponse(order)
+	return c.JSON(http.StatusOK, helper.SuccessResponses("success to read data", formatRes))
+}
+
 func (h *orderHandler) GetOrderController(c echo.Context) error {
 	userId := c.Get("currentUser").(entity.User)
 

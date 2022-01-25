@@ -15,6 +15,7 @@ type OrderRepository interface {
 	CreateOrderDetail(orderDetail entity.CreateOrderDetailRequest) (entity.CreateOrderDetailRequest, error)
 	GetId() (int, error)
 	GetOrder(id int) ([]entity.Order, error)
+	GetOrderById(userId, orderId int) (entity.Order, error)
 	UpdateOrder(order entity.Order) (entity.Order, error)
 }
 
@@ -134,6 +135,36 @@ func (r *orderRepository) UpdateOrder(order entity.Order) (entity.Order, error) 
 		fmt.Println("update error:", err)
 	}
 	return order, err
+}
+
+func (r *orderRepository) GetOrderById(userId, orderId int) (entity.Order, error){
+	order := entity.Order{}
+	result, err := r.db.Query(`SELECT o.id, u.id, u.username, o.cart, a.id, a.street, a.city, a.state, a.zip, o.status_order, o.order_date, o.total
+							  FROM orders o JOIN users u ON o.user_id = u.id
+							  JOIN address a ON o.address_id = a.id
+							  WHERE o.user_id = ? AND o.id = ?`, userId, orderId)
+	if err != nil {
+		fmt.Println(err)
+		return order, fmt.Errorf("failed in query")
+	}
+	defer result.Close()
+	var cartString string
+	err = result.Scan(&order.Id, &order.User.Id, &order.User.Username, &cartString, &order.Address.Id, 
+					   &order.Address.Street, &order.Address.City, &order.Address.State, &order.Address.Zip, &order.StatusOrder, &order.OrderDate, &order.Total)
+	cartByte := []byte(cartString)
+	var cartInt []int
+	_ = json.Unmarshal(cartByte, &cartInt) 
+	order.Cart = cartInt
+	
+	if err != nil {
+		fmt.Println(err)
+		return order, fmt.Errorf("failed to scan")
+	}
+
+	if orderId == order.Id{
+		return order, nil
+	}
+	return order, fmt.Errorf("order not found")
 }
 
 func (r *orderRepository) GetOrder(id int) ([]entity.Order, error) {
