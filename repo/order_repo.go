@@ -149,6 +149,9 @@ func (r *orderRepository) GetOrderById(userId, orderId int) (entity.Order, error
 	}
 	defer result.Close()
 	var cartString string
+	if isExist := result.Next(); !isExist {
+		fmt.Println("data not found", err)
+	}
 	err = result.Scan(&order.Id, &order.User.Id, &order.User.Username, &cartString, &order.Address.Id, 
 					   &order.Address.Street, &order.Address.City, &order.Address.State, &order.Address.Zip, &order.StatusOrder, &order.OrderDate, &order.Total)
 	cartByte := []byte(cartString)
