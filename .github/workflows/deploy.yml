@@ -17,7 +17,7 @@ jobs:
         key: ${{ secrets.KEY }}
         port: ${{ secrets.PORT }}
         script: |
-          cd /home/ubuntu/app
+          cd /home/ubuntu/app-baru
           git pull origin main
           docker stop ecommerce
           docker rm ecommerce
