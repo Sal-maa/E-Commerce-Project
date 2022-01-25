@@ -30,6 +30,7 @@ func UserRouter(db *sql.DB) *echo.Echo {
 	e.DELETE("/users", middleware.AuthMiddleware(authService, userService, userHandler.DeleteLogedInUserController))
 	// e.DELETE("/users/:id", middleware.AuthMiddleware(authService, userService, userHandler.DeleteUserController))
 
+
 	// Route Cart
 	cartRepository := repo.NewCartRepository(db)
 	cartService := service.NewCartService(cartRepository)
