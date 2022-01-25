@@ -39,20 +39,20 @@ func (h *orderHandler) CreateOrderController(c echo.Context) error {
 
 }
 
-func (h *orderHandler) UpdateOrderController(c echo.Context) error{
+func (h *orderHandler) UpdateOrderController(c echo.Context) error {
+	updatedOrder := entity.EditOrderRequest{}
+	if err := c.Bind(&updatedOrder); err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to bind data"))
+	}
+
 	idParam, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed convert id"))
 	}
 
-	orderUpdate := entity.EditOrderRequest{}
-	if err := c.Bind(&orderUpdate); err != nil {
-		fmt.Println(err)
-		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to bind data"))
-	}
-
-	_, err = h.orderService.UpdateOrderService(idParam, orderUpdate)
+	_, err = h.orderService.UpdateOrderService(idParam, updatedOrder)
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to update data"))
