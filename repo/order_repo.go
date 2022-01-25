@@ -139,7 +139,7 @@ func (r *orderRepository) UpdateOrder(order entity.Order) (entity.Order, error) 
 
 func (r *orderRepository) GetOrderById(userId, orderId int) (entity.Order, error){
 	order := entity.Order{}
-	result, err := r.db.Query(`SELECT o.id, u.id, u.username, o.cart, a.id, a.street, a.city, a.state, a.zip, o.status_order, o.order_date, o.total
+	result, err := r.db.Query(`SELECT o.id, u.id, u.username, o.cart_id, a.id, a.street, a.city, a.state, a.zip, o.status_order, o.order_date, o.total
 							  FROM orders o JOIN users u ON o.user_id = u.id
 							  JOIN address a ON o.address_id = a.id
 							  WHERE o.user_id = ? AND o.id = ?`, userId, orderId)
@@ -170,7 +170,7 @@ func (r *orderRepository) GetOrderById(userId, orderId int) (entity.Order, error
 func (r *orderRepository) GetOrder(id int) ([]entity.Order, error) {
 	orders := []entity.Order{}
 	//var cart string
-	result, err := r.db.Query(`SELECT o.id, u.id, u.username, o.cart, a.id, a.street, a.city, a.state, a.zip, o.status_order, o.order_date, o.total
+	result, err := r.db.Query(`SELECT o.id, u.id, u.username, o.cart_id, a.id, a.street, a.city, a.state, a.zip, o.status_order, o.order_date, o.total
 							  FROM orders o JOIN users u ON o.user_id = u.id
 							  JOIN address a ON o.address_id = a.id
 							  WHERE o.user_id = ?`, id)
