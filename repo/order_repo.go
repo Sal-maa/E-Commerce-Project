@@ -14,6 +14,7 @@ type OrderRepository interface {
 	CreateOrder(order entity.Order) (int, error)
 	CreateOrderDetail(orderDetail entity.CreateOrderDetailRequest) (entity.CreateOrderDetailRequest, error)
 	GetId() (int, error)
+	GetOrder(id int) ([]entity.Order, error)
 	UpdateOrder(order entity.Order) (entity.Order, error)
 }
 
@@ -79,10 +80,10 @@ func (r *orderRepository) CreateOrder(order entity.Order) (int, error) {
 	_, err := r.db.Exec(`INSERT INTO orders(created_at, updated_at, user_id, address_id, creditcard_id, cart_id, status_order, order_date, total)
 						VALUES(?,?,?,?,?,?,?,?,?);
 						`, order.CreatedAt, order.UpdatedAt, order.User.Id, order.Address.Id, order.CreditCard.Id, cartString, order.StatusOrder, order.OrderDate, order.Total)
-	
+
 	result, errId := r.db.Query(`SELECT id FROM orders WHERE created_at = ? AND updated_at = ?  AND user_id = ? 
 								AND address_id = ? AND creditcard_id = ? AND cart_id = ? AND status_order = ? AND order_date = ? AND total = ? ORDER BY id DESC LIMIT 1`,
-								order.CreatedAt, order.UpdatedAt, order.User.Id, order.Address.Id, order.CreditCard.Id, cartString, order.StatusOrder, order.OrderDate, order.Total)
+		order.CreatedAt, order.UpdatedAt, order.User.Id, order.Address.Id, order.CreditCard.Id, cartString, order.StatusOrder, order.OrderDate, order.Total)
 	if errId != nil {
 		fmt.Println("failed in query", errId)
 	}
@@ -100,7 +101,7 @@ func (r *orderRepository) CreateOrder(order entity.Order) (int, error) {
 	return orderId, err
 }
 
-func (r *orderRepository) CreateOrderDetail(orderDetail entity.CreateOrderDetailRequest) (entity.CreateOrderDetailRequest, error){
+func (r *orderRepository) CreateOrderDetail(orderDetail entity.CreateOrderDetailRequest) (entity.CreateOrderDetailRequest, error) {
 	_, err := r.db.Exec(`INSERT INTO order_details(order_id, cart_id) VALUES(?,?)`, orderDetail.OrderId, orderDetail.CartId)
 	if err != nil {
 		return orderDetail, err
@@ -133,4 +134,9 @@ func (r *orderRepository) UpdateOrder(order entity.Order) (entity.Order, error) 
 		fmt.Println("update error:", err)
 	}
 	return order, err
+}
+
+func (r *orderRepository) GetOrder(id int) ([]entity.Order, error) {
+	orders := []entity.Order{}
+	result, err := r.db.Query(`SELECT`)
 }

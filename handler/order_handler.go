@@ -59,3 +59,24 @@ func (h *orderHandler) UpdateOrderController(c echo.Context) error{
 	}
 	return c.JSON(http.StatusCreated, helper.SuccessWithoutDataResponses("success insert data"))
 }
+
+func (h *orderHandler) GetOrderController(c echo.Context) error {
+	userId := c.Get("currentUser").(entity.User)
+
+	orders, err := h.orderService.GetOrderService(userId.Id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.InternalServerError("failed to fetch data"))
+	}
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.InternalServerError("failed to fetch data"))
+	}
+
+	data := []entity.OrderResponse{}
+	for i := 0; i < len(orders); i++ {
+		formatRes := entity.FormatOrderResponse(orders[i])
+		data = append(data, formatRes)
+	}
+
+	return c.JSON(http.StatusOK, helper.SuccessResponses("success to read data", data))
+}

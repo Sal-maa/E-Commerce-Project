@@ -58,33 +58,23 @@ type EditOrderRequest struct {
 
 type OrderResponse struct {
 	User        UserOrderResponse `json:"user"`
-	Cart        CartOrderResponse `json:"cart"`
+	Cart        []int 			  `json:"cart"`
 	Address     Address           `json:"address"`
 	StatusOrder string            `json:"status_order"`
 	OrderDate   time.Time         `json:"order_date"`
 	Total       int               `json:"total"`
 }
 
-// func FormatOrderResponse(order Order) OrderResponse {
-// 	return OrderResponse{
-// 		User: UserOrderResponse{
-// 			Id:       order.User.Id,
-// 			Username: order.User.Username,
-// 		},
-// 		Cart: CartOrderResponse{
-// 			Id: order.Cart.Id,
-// 			Product: ProductCartResponse{
-// 				Id:     order.Cart.Product.Id,
-// 				Name:   order.Cart.Product.Name,
-// 				Gambar: order.Cart.Product.Gambar,
-// 				Harga:  order.Cart.Product.Harga,
-// 			},
-// 			Qty:      order.Cart.Qty,
-// 			Subtotal: order.Cart.Subtotal,
-// 		},
-// 		Address:     order.Address,
-// 		StatusOrder: order.StatusOrder,
-// 		OrderDate:   order.OrderDate,
-// 		Total:       order.Total,
-// 	}
-// }
+func FormatOrderResponse(order Order) OrderResponse {
+	return OrderResponse{
+		User: UserOrderResponse{
+			Id:       order.User.Id,
+			Username: order.User.Username,
+		},
+		Cart: 		 order.Cart,
+		Address:     order.Address,
+		StatusOrder: order.StatusOrder,
+		OrderDate:   order.OrderDate,
+		Total:       order.Total,
+	}
+}

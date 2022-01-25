@@ -11,6 +11,7 @@ import (
 type OrderService interface {
 	CreateOrderService(orderCreate entity.CreateOrderRequest) (entity.Order, error)
 	UpdateOrderService(id int, updatedOrder entity.EditOrderRequest) (entity.Order, error)
+	GetOrderService(id int) ([]entity.Order, error)
 }
 
 type orderService struct {
@@ -84,4 +85,12 @@ func (s *orderService) UpdateOrderService(id int, updatedOrder entity.EditOrderR
 		return order, err
 	}
 	return orderUpdated, nil
+}
+
+func (s *orderService) GetOrderService(id int) ([]entity.Order, error){
+	orders, err := s.repository.GetOrder(id)
+	if err != nil {
+		return orders, err
+	}
+	return orders, nil
 }
