@@ -39,18 +39,12 @@ func (s *cartService) CreateCartService(cartCreate entity.CreateCartRequest) (en
 
 func (s *cartService) GetAllCartsService(userId entity.User) ([]entity.Cart, error) {
 	carts, err := s.repository.GetAllCarts(userId)
-	if err != nil {
-		return carts, err
-	}
-	return carts, nil
+	return carts, err
 }
 
 func (s *cartService) GetCartByIdService(id int) (entity.Cart, error) {
 	cart, err := s.repository.GetCartById(id)
-	if err != nil {
-		return cart, err
-	}
-	return cart, nil
+	return cart, err
 }
 
 func (s *cartService) DeleteCartService(id, currentUser int) (entity.Cart, error) {

@@ -74,13 +74,25 @@ func TestGetProduct(t *testing.T) {
 	productRepository := repo.NewProductRepository(db)
 	productService := service.NewProductService(productRepository)
 
-	t.Run("TestGetAll", func(t *testing.T) {
+	t.Run("TestGetAllProducts", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
 		context.SetPath("/products")
 
-		result, err := productService.GetAllUserProductsService(1)
+		result, err := productService.GetAllUserProductsService(4)
+		if err != nil {
+			json.Marshal(err)
+		}
+		json.Marshal(result)
+	})
+	t.Run("TestGetAllProducts", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/products")
+
+		result, err := productService.GetAllProductsService()
 		if err != nil {
 			json.Marshal(err)
 		}
@@ -106,7 +118,7 @@ func TestGetProduct(t *testing.T) {
 		context.SetPath("/products/:id")
 		context.SetParamNames("id")
 
-		result, err := productService.GetProductByIdService(1)
+		result, err := productService.GetProductByIdService(1000)
 		if err != nil {
 			json.Marshal(err)
 		}
@@ -136,7 +148,7 @@ func TestUpdateProduct(t *testing.T) {
 		context.SetPath("/products/:id")
 		context.SetParamNames("id")
 
-		result, err := productService.UpdateProductService(8, input)
+		result, err := productService.UpdateProductService(5, input)
 		if err != nil {
 			json.Marshal(err)
 		}
