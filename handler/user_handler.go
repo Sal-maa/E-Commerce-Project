@@ -28,7 +28,7 @@ func (h *userHandler) CreateUserController(c echo.Context) error {
 		fmt.Println(err)
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("failed to bind data"))
 	}
-
+	fmt.Println("your user: ",userCreate)
 	if strings.Contains(userCreate.Username, " ") {
 		return c.JSON(http.StatusBadRequest, helper.FailedResponses("username can't contain space"))
 	}
