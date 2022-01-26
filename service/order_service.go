@@ -80,24 +80,15 @@ func (s *orderService) UpdateOrderService(id int, updatedOrder entity.EditOrderR
 	order.StatusOrder = updatedOrder.StatusOrder
 
 	orderUpdated, err := s.repository.UpdateOrder(order)
-	if err != nil {
-		return order, err
-	}
-	return orderUpdated, nil
+	return orderUpdated, err
 }
 
-func (s *orderService) GetOrderService(id int) ([]entity.Order, error){
+func (s *orderService) GetOrderService(id int) ([]entity.Order, error) {
 	orders, err := s.repository.GetOrder(id)
-	if err != nil {
-		return orders, err
-	}
-	return orders, nil
+	return orders, err
 }
 
-func (s *orderService) GetOrderByIdService(userId, orderId int) (entity.Order, error){
+func (s *orderService) GetOrderByIdService(userId, orderId int) (entity.Order, error) {
 	order, err := s.repository.GetOrderById(userId, orderId)
-	if err != nil {
-		return order, err
-	}
-	return order, nil
+	return order, err
 }
